@@ -12,6 +12,7 @@ export default function Profile() {
     const produtorId = localStorage.getItem('produtorId');
     const produtorName = localStorage.getItem('produtorName');
     
+    
     useEffect(() => {
         api.get('profile', {
             headers: {
@@ -59,7 +60,7 @@ export default function Profile() {
                 <strong>Validade</strong>
                 <strong>Unidades</strong>
                 <strong>QRcode</strong>
-
+                
                 {mel.map(mel => (
                     <li key={mel.id}>
                         

@@ -2,19 +2,23 @@ import React, { useState } from "react";
 import { FiArrowLeft } from "react-icons/fi";
 import { Link, useHistory } from 'react-router-dom';
 import { Tab, Tabs,TabList, TabPanel } from 'react-tabs';
-import 'react-tabs/style/react-tabs.css'
+import 'react-tabs/style/react-tabs.css';
+import { QRCodeSVG } from 'qrcode.react';
 
 import api from "../../services/api";
 import './style.css';
 
 export default function NewHoney() {    
-    const [id, setId] = useState('');
-    const [produtor, setProdutor] = useState('');
-    const [especializacao, setEspecializacao] = useState('');
+
+    const [producao_id, setProducao_id] = useState('');
+    const [especialidade, setEspecialidade] = useState('');
     const [peso, setPeso] = useState('');
     const [fabricacao, setFabricacao] = useState('');
     const [validade, setValidade] = useState('');
     const [localizacao, setLocalizacao] = useState('');
+    const [data_coleta, setData_coleta] = useState('');
+    const [qtd_colmeias, setQtd_colmeias] = useState('');
+    
 
     const history = useHistory();
 
@@ -22,9 +26,8 @@ export default function NewHoney() {
         e.priventDefault();
 
         const data = {
-            id,
             producao_id,
-            especializacao,
+            especialidade,
             peso,
             fabricacao,
             validade,
@@ -46,13 +49,11 @@ export default function NewHoney() {
         e.priventDefault();
 
         const data = {
-            id,
             peso,
             data_coleta,
             localizacao,
-            especializacao,
+            especialidade,
             qtd_colmeias,
-            id_colmeias,
         };
 
         try{
@@ -83,27 +84,22 @@ export default function NewHoney() {
                 <Tabs>
                     <TabList>
                         <Tab>Produtos beneficiados</Tab>
-                        <Tab>Produtos</Tab>
+                        <Tab>Produção</Tab>
                     </TabList>
 
                     <TabPanel>
                         <form onSubmit={handleNewHoney}>
-                            <input 
-                                placeholder="Id"
-                                value={id}
-                                onChange={e => setId(e.target.value)}
-                            />
                             
                             <input 
                                 placeholder="ID da Producao"
                                 value={producao_id}
-                                onChange={e => setProdutor(e.target.value)}
+                                onChange={e => setProducao_id(e.target.value)}
                             />
                             
                             <input 
-                                placeholder="Especialisação"
-                                value={especializacao}
-                                onChange={e => setEspecializacao(e.target.value)}
+                                placeholder="Especialidade"
+                                value={especialidade}
+                                onChange={e => setEspecialidade(e.target.value)}
                             />
                             
                             <input 
@@ -137,48 +133,37 @@ export default function NewHoney() {
 
                     <TabPanel>
                         <form onSubmit={handleNewProduction}>
-                            <input 
-                                 placeholder="Id"
-                                value={id}
-                                 onChange={e => setId(e.target.value)}
-                            />
                                 
                             <input 
                                  placeholder="Peso"
-                                 value={produtor}
-                                onChange={e => setProdutor(e.target.value)}
+                                 value={peso}
+                                onChange={e => setPeso(e.target.value)}
                             />
                                 
                             <input 
                                 placeholder="data/hora da coleta"
-                                value={especializacao}
-                                onChange={e => setEspecializacao(e.target.value)}
+                                value={data_coleta}
+                                onChange={e => setData_coleta(e.target.value)}
                             />
                                 
                             <input 
                                 placeholder="Localizacao"
-                                value={peso}
-                                 onChange={e => setPeso(e.target.value)}
+                                value={localizacao}
+                                 onChange={e => setLocalizacao(e.target.value)}
                             />
                                 
                             <input 
-                                placeholder="Especializacao"
-                                value={fabricacao}
-                                onChange={e => setFabricacao(e.target.value)}
+                                placeholder="Especialidade"
+                                value={especialidade}
+                                onChange={e => setEspecialidade(e.target.value)}
                             />
                                 
                             <input 
                                 placeholder="Numero de colmeias"
-                                value={validade}
-                                onChange={e => setValidade(e.target.value)}
+                                value={qtd_colmeias}
+                                onChange={e => setQtd_colmeias(e.target.value)}
                             />
                                 
-                            <input 
-                                placeholder="id_colmeias"
-                                value={localizacao}
-                                onChange={e => setLocalizacao(e.target.value)}
-                            />
-
                             <button className="button" type="submit">Cadastrar</button>
 
                          </form>

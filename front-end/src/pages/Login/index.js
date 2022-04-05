@@ -11,13 +11,13 @@ export default function Login() {
     const history = useHistory('');
 
     async function handleLogin(e) {
-        e.priventDefault();
+        e.preventDefault();
 
         try {
             const response = await api.post('session', { id });
             
             localStorage.setItem('produtorId', id);
-            localStorage.setItem('produtorName', response.data.name);
+            localStorage.setItem('produtorName', response.data.nome);
 
             history.push('/profile');
         }catch (err) {
@@ -37,14 +37,15 @@ export default function Login() {
                         onChange={e => setId(e.target.value)}
                     />
                     <button className="button" type= "submit">Entrar</button>
-                    
+                </form> 
+
                     <Link className="back-link" to="/register">
                         <FiLogIn size={16} color="darkorange" />
                             Nao tenho cadastro
                     </Link>
                         
                     
-                </form>
+            
             </section>
 
         </div>
