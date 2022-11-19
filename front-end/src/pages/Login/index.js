@@ -1,53 +1,69 @@
-import React, { useState } from "react";
-import { FiLogIn } from 'react-icons/fi';
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { FiLogIn } from "react-icons/fi";
 import { Link, useHistory } from "react-router-dom";
+import useContract from "../../hooks/useContract";
+import { abi } from "../../abi/Authentication.json";
+import { Authentication } from "../../abi/address.json";
+import { useWeb3Context } from "web3-react";
 
-import api from "../../services/api";
-import './style.css';
-
+//import api from "../../services/api";
+import "./style.css";
 
 export default function Login() {
-    const [id, setId] = useState('');
-    const history = useHistory('');
+  const [id, setId] = useState("");
+  const history = useHistory("");
 
-    async function handleLogin(e) {
-        e.preventDefault();
+  const context = useWeb3Context();
+  const contract = useContract(abi, Authentication);
 
-        try {
-            const response = await api.post('session', { id });
-            
-            localStorage.setItem('produtorId', id);
-            localStorage.setItem('produtorName', response.data.nome);
+  // useEffect(() => {
+  //   (async function fetch() {
+  //     await getConnection();
+  //   })();
+  //   console.log(context);
+  // }, [context.active]);
 
-            history.push('/profile');
-        }catch (err) {
-            alert('Falha no login, tente novamente!')
-        }
-    }   
+  async function handleLogin(e) {
+    e.preventDefault();
 
-    return (
-        <div className="login-container">
-            <section className="form">
-                <form onSubmit={handleLogin}>
-                    <h1>Faça seu login!</h1>
+    try {
+      //const response = await api.post("session", { id });
 
-                    <input 
-                        placeholder="Seu ID"
-                        value={id}
-                        onChange={e => setId(e.target.value)}
-                    />
-                    <button className="button" type= "submit">Entrar</button>
-                </form> 
+      if (!context.active);
+      const response = await contract.methods.getUser(id).call();
+      console.log("res ", response);
+      localStorage.setItem("userId", response.id);
+      localStorage.setItem("userRole", response.user);
+      localStorage.setItem("userName", response.name);
 
-                    <Link className="back-link" to="/register">
-                        <FiLogIn size={16} color="darkorange" />
-                            Nao tenho cadastro
-                    </Link>
-                        
-                    
-            
-            </section>
+      history.push("/profile");
+    } catch (err) {
+      console.log(err);
+      alert("Falha no login, tente novamente!");
+    }
+  }
 
-        </div>
-    );
+  return (
+    <div className="login-container">
+      <section className="form">
+        <form onSubmit={handleLogin}>
+          <h1>Faça seu login!</h1>
+
+          <input
+            placeholder="Seu ID"
+            value={id}
+            onChange={(e) => setId(e.target.value)}
+          />
+          <button className="button" type="submit">
+            Entrar
+          </button>
+        </form>
+
+        <Link className="back-link" to="/register">
+          <FiLogIn size={16} color="darkorange" />
+          Nao tenho cadastro
+        </Link>
+      </section>
+    </div>
+  );
 }

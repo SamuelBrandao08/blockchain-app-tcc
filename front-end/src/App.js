@@ -1,25 +1,21 @@
-//import { greeterContract } from './EthereumSetup';
-import React from 'react';
-//import { useState, useEffect } from 'react';
-import './global.css';
+import React from "react";
+import "./global.css";
+import { connectors } from "./utils/connectors";
+import Web3Provider from "web3-react";
+import Web3 from "web3";
+import getLibrary from "./utils/getLibrary";
 
-import Routes from './routes';
-
+import Routes from "./routes";
 
 function App() {
-
-  // const [greeting, setGreeting] = useState("");
-
-  // useEffect(() => {
-  //   var data = greeterContract.greet()
-  //   setGreeting(String(data))
-  // },[])
-
-
   return (
-    
-    <Routes/>
-    //<h1> "{greeting}" </h1>
+    <Web3Provider
+      connectors={connectors}
+      libraryName={getLibrary}
+      Web3Api={Web3}
+    >
+      <Routes />
+    </Web3Provider>
   );
 }
 

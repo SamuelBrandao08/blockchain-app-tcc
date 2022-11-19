@@ -1,175 +1,174 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FiArrowLeft } from "react-icons/fi";
-import { Link, useHistory } from 'react-router-dom';
-import { Tab, Tabs,TabList, TabPanel } from 'react-tabs';
-import 'react-tabs/style/react-tabs.css';
-import { QRCodeSVG } from 'qrcode.react';
+import { Link, useHistory } from "react-router-dom";
+import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
+import "react-tabs/style/react-tabs.css";
+import { QRCodeSVG } from "qrcode.react";
 
 import api from "../../services/api";
-import './style.css';
+import "./style.css";
+import useContract from "../../hooks/useContract";
 
-export default function NewHoney() {    
+import { abi } from "../../abi/RegistrarProducao.json";
+import { RegistrarProducao } from "../../abi/address.json";
 
-    const [producao_id, setProducao_id] = useState('');
-    const [especialidade, setEspecialidade] = useState('');
-    const [peso, setPeso] = useState('');
-    const [fabricacao, setFabricacao] = useState('');
-    const [validade, setValidade] = useState('');
-    const [localizacao, setLocalizacao] = useState('');
-    const [data_coleta, setData_coleta] = useState('');
-    const [qtd_colmeias, setQtd_colmeias] = useState('');
-    
+export default function NewHoney() {
+  const [producao_id, setProducao_id] = useState(1000);
+  const [especialidade, setEspecialidade] = useState("");
+  const [peso, setPeso] = useState("");
+  const [fabricacao, setFabricacao] = useState("");
+  const [validade, setValidade] = useState("");
+  const [localizacao, setLocalizacao] = useState("");
+  const [data_coleta, setData_coleta] = useState("");
+  const [colmeiasId, setColmeiasId] = useState([]);
 
-    const history = useHistory();
+  const { getConnection, getContract, context } = useContract();
+  const history = useHistory();
+  const userId = localStorage.getItem("userId");
+  console.log("user ", userId);
 
-    async function handleNewHoney(e) {
-        e.priventDefault();
+  useEffect(() => {
+    (async function fetch() {
+      await getConnection();
+    })();
+    console.log(context);
+  }, [context.active]);
 
-        const data = {
-            producao_id,
-            especialidade,
-            peso,
-            fabricacao,
-            validade,
-            localizacao,
-        };
+  async function handleNewHoney(e) {
+    e.preventDefault();
 
-        try{
-            await api.post('mel', data);
-            alert("Produto registrado!")
+    const data = [
+      producao_id,
+      especialidade,
+      peso,
+      fabricacao,
+      validade,
+      localizacao,
+    ];
 
-            history.push('/honey/new');
-        }catch (err) {
-            alert('Erro no cadastro, tente novamente.');
-        }
+    try {
+      // await api.post("mel", data);
+      // alert("Produto registrado!");
 
+      // await contract.methods.RegisterProduct2(data).send({
+      //   from: context.account,
+      // });
+
+      history.push("/honey/new");
+    } catch (err) {
+      alert("Erro no cadastro, tente novamente.");
     }
+  }
 
-    async function handleNewProduction(e) {
-        e.priventDefault();
+  async function handleNewProduction(e) {
+    e.preventDefault();
 
-        const data = {
-            peso,
-            data_coleta,
-            localizacao,
-            especialidade,
-            qtd_colmeias,
-        };
+    console.log("id producao", producao_id);
+    //const data = [peso, data_coleta, localizacao, especialidade, qtd_colmeias];
 
-        try{
-            await api.post('mel', data);
-            alert("Produto registrado!")
+    try {
+      // await api.post("mel", data);
+      // alert("Produto registrado!");
 
-            history.push('/honey/new');
-        }catch (err) {
-            alert('Erro no cadastro, tente novamente.');
-        }
+      const contract = await getContract(abi, RegistrarProducao);
+      console.log("contato ", contract);
+      await contract.methods
+        .RegisterProduction(producao_id, peso, localizacao, userId, [
+          colmeiasId,
+        ])
+        .send({
+          from: context.account,
+        });
 
+      history.push("/honey/new");
+    } catch (err) {
+      alert("Erro no cadastro, tente novamente.");
     }
+  }
 
-    return (
-        <div className="new-honey-container">
-            <div className="content">
-                <section>
-                    <h1>Cadastrar novo mel</h1>
-                    <p>Descreva as propriedades do seu mel!</p>
+  return (
+    <div className="new-honey-container">
+      <div className="content">
+        <section>
+          <h1>Cadastrar novo mel</h1>
+          <p>Descreva as propriedades do seu mel!</p>
 
-                    <Link className="back-link" to="/profile">
-                        <FiArrowLeft size={16} color="#e02041"/>
-                        Voltar para home
-                    </Link>
+          <Link className="back-link" to="/profile">
+            <FiArrowLeft size={16} color="#e02041" />
+            Voltar para home
+          </Link>
+        </section>
 
-                </section>
+        <Tabs>
+          <TabList>
+            <Tab>Produtos beneficiados</Tab>
+            <Tab>Produção</Tab>
+          </TabList>
 
-                <Tabs>
-                    <TabList>
-                        <Tab>Produtos beneficiados</Tab>
-                        <Tab>Produção</Tab>
-                    </TabList>
+          <TabPanel>
+            <form onSubmit={handleNewHoney}>
+              <input
+                placeholder="ID da Producao"
+                value={producao_id}
+                onChange={(e) => setProducao_id(e.target.value)}
+              />
 
-                    <TabPanel>
-                        <form onSubmit={handleNewHoney}>
-                            
-                            <input 
-                                placeholder="ID da Producao"
-                                value={producao_id}
-                                onChange={e => setProducao_id(e.target.value)}
-                            />
-                            
-                            <input 
-                                placeholder="Especialidade"
-                                value={especialidade}
-                                onChange={e => setEspecialidade(e.target.value)}
-                            />
-                            
-                            <input 
-                                placeholder="Peso"
-                                value={peso}
-                                onChange={e => setPeso(e.target.value)}
-                            />
-                            
-                            <input 
-                                placeholder="Data de fabricação"
-                                value={fabricacao}
-                                onChange={e => setFabricacao(e.target.value)}
-                            />
-                            
-                            <input 
-                                placeholder="Validade"
-                                value={validade}
-                                onChange={e => setValidade(e.target.value)}
-                            />
-                            
-                            <input 
-                                placeholder="Localização"
-                                value={localizacao}
-                                onChange={e => setLocalizacao(e.target.value)}
-                            />
+              <input
+                placeholder="Peso"
+                value={peso}
+                onChange={(e) => setPeso(e.target.value)}
+              />
 
-                            <button className="button" type="submit">Cadastrar</button>
+              <input
+                placeholder="Localização"
+                value={localizacao}
+                onChange={(e) => setLocalizacao(e.target.value)}
+              />
 
-                        </form>
-                    </TabPanel>
+              <input
+                placeholder="ID das colmeias"
+                value={colmeiasId}
+                onChange={(e) => setColmeiasId(e.target.value)}
+              />
+              <button className="button" type="submit">
+                Cadastrar
+              </button>
+            </form>
+          </TabPanel>
 
-                    <TabPanel>
-                        <form onSubmit={handleNewProduction}>
-                                
-                            <input 
-                                 placeholder="Peso"
-                                 value={peso}
-                                onChange={e => setPeso(e.target.value)}
-                            />
-                                
-                            <input 
-                                placeholder="data/hora da coleta"
-                                value={data_coleta}
-                                onChange={e => setData_coleta(e.target.value)}
-                            />
-                                
-                            <input 
-                                placeholder="Localizacao"
-                                value={localizacao}
-                                 onChange={e => setLocalizacao(e.target.value)}
-                            />
-                                
-                            <input 
-                                placeholder="Especialidade"
-                                value={especialidade}
-                                onChange={e => setEspecialidade(e.target.value)}
-                            />
-                                
-                            <input 
-                                placeholder="Numero de colmeias"
-                                value={qtd_colmeias}
-                                onChange={e => setQtd_colmeias(e.target.value)}
-                            />
-                                
-                            <button className="button" type="submit">Cadastrar</button>
+          <TabPanel>
+            <form onSubmit={handleNewProduction}>
+              <input
+                placeholder="ID da Producao"
+                value={producao_id}
+                onChange={(e) => setProducao_id(e.target.value)}
+              />
 
-                         </form>
-                    </TabPanel>
-                </Tabs>
-            </div>
-        </div>
-    );
+              <input
+                placeholder="Peso"
+                value={peso}
+                onChange={(e) => setPeso(e.target.value)}
+              />
+
+              <input
+                placeholder="Localizacao"
+                value={localizacao}
+                onChange={(e) => setLocalizacao(e.target.value)}
+              />
+
+              <input
+                placeholder="ID das colmeias"
+                value={colmeiasId}
+                onChange={(e) => setColmeiasId(e.target.value)}
+              />
+
+              <button className="button" type="submit">
+                Cadastrar
+              </button>
+            </form>
+          </TabPanel>
+        </Tabs>
+      </div>
+    </div>
+  );
 }
