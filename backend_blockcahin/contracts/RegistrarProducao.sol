@@ -162,7 +162,6 @@ contract RegistrarProducao {
     function registerProduct(string memory _user, Honey memory _honey)
         public
         onlyOWNER(_user)
-        returns (string calldata)
     {
         require(
             product[tx.origin][_honey.codigo].codigo == 0,
@@ -179,7 +178,6 @@ contract RegistrarProducao {
             _honey.producaoId
         );
         productCode.push(_honey.codigo);
-        return string(msg.data);
     }
 
     function registerProduct2(Honey memory _honey, string memory _user)

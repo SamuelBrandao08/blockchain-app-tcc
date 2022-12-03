@@ -1,5 +1,5 @@
 const HDWalletProvider = require("@truffle/hdwallet-provider");
-const fs = require('fs');
+const fs = require("fs");
 const mnemonicPhrase = fs.readFileSync(".secret").toString().trim();
 
 module.exports = {
@@ -16,16 +16,15 @@ module.exports = {
       provider: () =>
         new HDWalletProvider({
           mnemonic: {
-            phrase: mnemonicPhrase
+            phrase: mnemonicPhrase,
           },
-          providerOrUrl: "HTTP://127.0.0.1:7545",
+          providerOrUrl: "http://192.168.1.139:7545",
+          //providerOrUrl: "HTTP://127.0.0.1:7545",
           skipDryRun: true,
-          derivationPath: "m/44'/60'/0'/0/"
+          //derivationPath: "m/44'/60'/0'/0/",
         }),
-      network_id: '5777',
-    }
-
-    
+      network_id: "1500",
+    },
   },
   compilers: {
     solc: {
@@ -33,9 +32,9 @@ module.exports = {
       settings: {
         optimizer: {
           enabled: true, // Default: false
-          runs: 200      // Default: 200
+          runs: 200, // Default: 200
         },
-      }
-    }
-  }
+      },
+    },
+  },
 };
