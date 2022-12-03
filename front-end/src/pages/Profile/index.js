@@ -8,14 +8,20 @@ import { RegistrarProducao } from "../../abi/address.json";
 import "./style.css";
 import api from "../../services/api";
 import { useWeb3Context } from "web3-react";
+import ProductionTableRow from "./ProductionTableRow";
+import MelTableRow from "./MelTableRow";
+import { FiArrowLeft } from "react-icons/fi";
 
 export default function Profile() {
   const [mel, setMel] = useState([]);
-  const [production, setProduction] = useState([]);
+  const [productions, setProductions] = useState([]);
   const [batch, setBatch] = useState();
 
-  const contract = useContract(abi, RegistrarProducao);
+  const [showMel, setShowMel] = useState(false);
 
+  const context = useWeb3Context();
+  const contract = useContract(abi, RegistrarProducao);
+  console.log(context);
   const history = useHistory("");
 
   const userId = localStorage.getItem("userId");
@@ -38,25 +44,63 @@ export default function Profile() {
   useEffect(() => {
     (async function fetch() {
       if (contract) {
-        setProduction(await contract.methods.listProduction().call());
+        setProductions(await contract.methods.listProduction().call());
       }
     })();
   }, [contract]);
-  console.log("producao ", production);
+  console.log("producao ", productions);
 
-  async function handleShowMel(id) {
-    try {
-      // await api.get(`mel/${id}`, {
-      //   headers: {
-      //     Authorization: produtorId,
-      //   },
-      // });
-      //const response = await contract.methods.listProductBatch(batch).call();
-      //setMel(response);
-    } catch (err) {
-      alert("Falha na operação");
+  // useEffect(() => {
+  //   (async function fetch() {
+  //     if (contract) {
+  //       setMel(await contract.methods.listProduct().call());
+  //     }
+  //   })();
+  // }, [contract]);
+
+  async function handleShowMel() {
+    // try {
+    //   // await api.get(`mel/${id}`, {
+    //   //   headers: {
+    //   //     Authorization: produtorId,
+    //   //   },
+    //   // });
+    //   //const response = await contract.methods.listProductBatch(batch).call();
+    //   //setMel(response);
+    // } catch (err) {
+    //   alert("Falha na operação");
+    // }
+
+    if (contract) {
+      setMel(await contract.methods.listProduct().call());
+      setShowMel(true);
     }
+
+    console.log("funcao handleShowMel");
+
+    // return (
+    //   <main>
+    //     {console.log("aqui")}
+    //     <h3>Produto Beneficiado</h3>
+    //     <table className="table table-striped">
+    //       <thead>
+    //         <tr>
+    //           <th>ID</th>
+    //           <th>Peso Total</th>
+    //           <th>Data de coleta</th>
+    //           <th>Localização</th>
+    //           <th>Apicultor</th>
+    //           <th>Colmeias</th>
+    //           <th colSpan={2} style={{ textAlign: "center" }}></th>
+    //         </tr>
+    //       </thead>
+    //       <tbody>{generateTable2()}</tbody>
+    //       {console.log("genarateTable2")}
+    //     </table>
+    //   </main>
+    // );
   }
+  console.log("mel ", mel);
 
   function handleLogout() {
     localStorage.clear();
@@ -64,26 +108,96 @@ export default function Profile() {
     history.push("/");
   }
 
+  function generateTable() {
+    if (!productions) return;
+    return productions.map((production, i) => {
+      return (
+        <ProductionTableRow
+          production={production}
+          key={i}
+          handleShowMel={handleShowMel}
+        />
+      );
+    });
+  }
+
+  function generateTable2() {
+    if (!mel) return;
+    return mel.map((mel, i) => {
+      return <MelTableRow mel={mel} key={i} handleShowMel={handleShowMel} />;
+    });
+  }
+
   return (
     <div className="profile-container">
       <header>
         <span>Bem vindo, {userName}</span>
 
-        <Link className="button" to="/honey/new">
+        <Link className="button" to="/batch/new">
           Cadastrar novo lote de mel
         </Link>
         <button onClick={handleLogout} type="button" size={18}>
           sair
         </button>
       </header>
+      {!mel ? (
+        <main>
+          {console.log("mel3", mel)}
+          <h3>Produção</h3>
+          <table className="table table-striped">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Peso Total</th>
+                <th>Data de coleta</th>
+                <th>Localização</th>
+                <th>Apicultor</th>
+                <th>Colmeias</th>
+                <th colSpan={2} style={{ textAlign: "center" }}></th>
+              </tr>
+            </thead>
+            <tbody>{generateTable()}</tbody>
+          </table>
+        </main>
+      ) : (
+        <div>
+          <main>
+            {console.log("aqui")}
+            <h3>Produto Beneficiado</h3>
+            <table className="table table-striped">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Peso Total</th>
+                  <th>Data de coleta</th>
+                  <th>Localização</th>
+                  <th>Apicultor</th>
+                  <th>Colmeias</th>
+                  <th colSpan={2} style={{ textAlign: "center" }}></th>
+                </tr>
+              </thead>
+              <tbody>{generateTable2()}</tbody>
+              {console.log("genarateTable2")}
+            </table>
+          </main>
+          <Link
+            className="back-link"
+            to={"/profile"}
+            onClick={() => setShowMel(false)}
+          >
+            <FiArrowLeft size={16} color="#e02041" />
+            Voltar
+          </Link>
+        </div>
+      )}
 
-      <h1>Produtos cadastrados</h1>
+      {/* <h1>Produção</h1>
 
       <ul>
-        <strong>Tipo</strong>
-        <strong>Fabricação</strong>
-        <strong>Validade</strong>
-        <strong>Unidades</strong>
+        <strong>ID</strong>
+        <strong>Peso Total</strong>
+        <strong>Data de coleta</strong>
+        <strong>Localização</strong>
         <strong>QRcode</strong>
 
         {mel.map((mel) => (
@@ -103,7 +217,7 @@ export default function Profile() {
             </button>
           </li>
         ))}
-      </ul>
+      </ul> */}
     </div>
   );
 }

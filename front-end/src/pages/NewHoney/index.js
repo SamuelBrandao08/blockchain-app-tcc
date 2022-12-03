@@ -11,51 +11,52 @@ import useContract from "../../hooks/useContract";
 
 import { abi } from "../../abi/RegistrarProducao.json";
 import { RegistrarProducao } from "../../abi/address.json";
+import { useWeb3Context } from "web3-react";
 
 export default function NewHoney() {
-  const [producao_id, setProducao_id] = useState(1000);
-  const [especialidade, setEspecialidade] = useState("");
-  const [peso, setPeso] = useState("");
-  const [fabricacao, setFabricacao] = useState("");
-  const [validade, setValidade] = useState("");
-  const [localizacao, setLocalizacao] = useState("");
-  const [data_coleta, setData_coleta] = useState("");
-  const [colmeiasId, setColmeiasId] = useState([]);
-
-  const { getConnection, getContract, context } = useContract();
   const history = useHistory();
+
+  const [codigo, setCodigo] = useState(1);
+  const [lote, setLote] = useState(1);
+  const [especializacao, setEspecializacao] = useState("");
+  const [producaoId, setProducaoId] = useState(history.location.state);
+  const [peso, setPeso] = useState(100);
+  const [localizacao, setLocalizacao] = useState("Morada Nova");
+  const [date, setDate] = useState(0);
+  const [colmeiasId, setColmeiasId] = useState([3, 4]);
+
+  const context = useWeb3Context();
+  const contract = useContract(abi, RegistrarProducao);
+
   const userId = localStorage.getItem("userId");
-  console.log("user ", userId);
-
-  useEffect(() => {
-    (async function fetch() {
-      await getConnection();
-    })();
-    console.log(context);
-  }, [context.active]);
-
+  console.log("user ", typeof userId);
+  const producao_id = history.location.state;
+  console.log(producao_id);
   async function handleNewHoney(e) {
     e.preventDefault();
 
     const data = [
-      producao_id,
-      especialidade,
+      codigo,
+      lote,
+      especializacao,
       peso,
-      fabricacao,
-      validade,
+      date,
       localizacao,
+      producaoId,
     ];
 
     try {
       // await api.post("mel", data);
       // alert("Produto registrado!");
 
-      // await contract.methods.RegisterProduct2(data).send({
-      //   from: context.account,
-      // });
+      console.log(contract);
+      await contract.methods.registerProduct2(data, userId).send({
+        from: context.account,
+      });
 
       history.push("/honey/new");
     } catch (err) {
+      console.log(err);
       alert("Erro no cadastro, tente novamente.");
     }
   }
@@ -63,25 +64,24 @@ export default function NewHoney() {
   async function handleNewProduction(e) {
     e.preventDefault();
 
-    console.log("id producao", producao_id);
+    console.log("id producao", producaoId);
     //const data = [peso, data_coleta, localizacao, especialidade, qtd_colmeias];
 
     try {
       // await api.post("mel", data);
       // alert("Produto registrado!");
 
-      const contract = await getContract(abi, RegistrarProducao);
+      //const contract = await getContract(abi, RegistrarProducao);
       console.log("contato ", contract);
-      await contract.methods
-        .RegisterProduction(producao_id, peso, localizacao, userId, [
-          colmeiasId,
-        ])
+      contract.methods
+        .registerProduction(producaoId, peso, localizacao, userId, colmeiasId)
         .send({
           from: context.account,
         });
 
       history.push("/honey/new");
     } catch (err) {
+      console.log(err);
       alert("Erro no cadastro, tente novamente.");
     }
   }
@@ -108,27 +108,39 @@ export default function NewHoney() {
           <TabPanel>
             <form onSubmit={handleNewHoney}>
               <input
-                placeholder="ID da Producao"
-                value={producao_id}
-                onChange={(e) => setProducao_id(e.target.value)}
+                placeholder="Codigo do Produto"
+                value={codigo}
+                onChange={(e) => setCodigo(e.target.value)}
               />
-
+              <input
+                placeholder="Lote do Produto"
+                value={lote}
+                onChange={(e) => setLote(e.target.value)}
+              />
+              <input
+                placeholder="Especie do mel"
+                value={especializacao}
+                onChange={(e) => setEspecializacao(e.target.value)}
+              />
               <input
                 placeholder="Peso"
                 value={peso}
                 onChange={(e) => setPeso(e.target.value)}
               />
-
+              <input
+                placeholder="Data de fabricação"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+              />
               <input
                 placeholder="Localização"
                 value={localizacao}
                 onChange={(e) => setLocalizacao(e.target.value)}
               />
-
               <input
-                placeholder="ID das colmeias"
-                value={colmeiasId}
-                onChange={(e) => setColmeiasId(e.target.value)}
+                placeholder="ID da producao"
+                value={producaoId}
+                onChange={(e) => setProducaoId(e.target.value)}
               />
               <button className="button" type="submit">
                 Cadastrar
@@ -140,8 +152,8 @@ export default function NewHoney() {
             <form onSubmit={handleNewProduction}>
               <input
                 placeholder="ID da Producao"
-                value={producao_id}
-                onChange={(e) => setProducao_id(e.target.value)}
+                value={producaoId}
+                onChange={(e) => setProducaoId(e.target.value)}
               />
 
               <input

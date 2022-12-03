@@ -14,14 +14,8 @@ export default function Login() {
   const history = useHistory("");
 
   const context = useWeb3Context();
-  const contract = useContract(abi, Authentication);
 
-  // useEffect(() => {
-  //   (async function fetch() {
-  //     await getConnection();
-  //   })();
-  //   console.log(context);
-  // }, [context.active]);
+  const contract = useContract(abi, Authentication);
 
   async function handleLogin(e) {
     e.preventDefault();
