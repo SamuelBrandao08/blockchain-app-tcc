@@ -10,7 +10,7 @@ import { useWeb3Context } from "web3-react";
 import "./style.css";
 
 export default function Login() {
-  const [id, setId] = useState("");
+  const [id, setId] = useState("samuel");
   const history = useHistory("");
 
   const context = useWeb3Context();
@@ -24,7 +24,7 @@ export default function Login() {
       //const response = await api.post("session", { id });
 
       if (!context.active);
-      const response = await contract.methods.getUser(id).call();
+      const response = await contract.methods.getUser("samuel").call();
       console.log("res ", response);
       localStorage.setItem("userId", response.id);
       localStorage.setItem("userRole", response.user);
