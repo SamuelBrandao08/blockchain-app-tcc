@@ -23,25 +23,23 @@ function ProductionTableRow(props) {
   }
 
   return (
-    <div>
-      <tr>
-        <td>{id}</td>
-        <td>{WeightTotal}</td>
-        <td>{date}</td>
-        <td>{localization}</td>
-        <td>{apicultorId}</td>
-        <td>{colmeiasId}</td>
+    <tr>
+      <td>{id}</td>
+      <td>{WeightTotal}</td>
+      <td>{date}</td>
+      <td>{localization}</td>
+      <td>{apicultorId}</td>
+      <td>{colmeiasId}</td>
 
-        <td>
-          <button onClick={() => handleShowHoney()} className="btn btn-danger">
-            Ver Produção
-          </button>
-          <button onClick={() => registerHoney()} className="btn btn-danger">
-            Registrar Mel
-          </button>
-        </td>
-      </tr>
-    </div>
+      <td>
+        <button onClick={() => handleShowHoney()} className="btn btn-danger">
+          Ver Produção
+        </button>
+        <button onClick={() => registerHoney()} className="btn btn-danger">
+          Registrar Mel
+        </button>
+      </td>
+    </tr>
   );
 }
 export default ProductionTableRow;

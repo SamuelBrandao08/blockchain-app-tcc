@@ -30,10 +30,10 @@ contract Auth {
     }
 
     // user login function
-    function login(address _address, string memory _password)
-        public
-        returns (bool)
-    {
+    function login(
+        address _address,
+        string memory _password
+    ) public returns (bool) {
         if (
             keccak256(abi.encodePacked(user[_address].password)) ==
             keccak256(abi.encodePacked(_password))

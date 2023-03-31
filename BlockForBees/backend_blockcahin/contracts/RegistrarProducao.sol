@@ -66,10 +66,10 @@ contract RegistrarProducao {
     }
 
     // Verifica se o endereço que esta chamando o contrato possui permisao para modificar o estado da rede
-    modifier onlyOWNER(address _id) {
+    modifier onlyOWNER(address _addr) {
         require(
-            keccak256(abi.encodePacked(instance.getId(_id))) ==
-                keccak256(abi.encodePacked(_id)),
+            keccak256(abi.encodePacked(instance.activeUser(_addr))) ==
+                keccak256(abi.encodePacked(_addr)),
             "Permissao negada!"
         );
         _;
@@ -102,11 +102,9 @@ contract RegistrarProducao {
         return colmeia;
     }
 
-    function getColmeiaById(uint256 _colmeiaId)
-        public
-        view
-        returns (Colmeia memory)
-    {
+    function getColmeiaById(
+        uint256 _colmeiaId
+    ) public view returns (Colmeia memory) {
         return colmeias[tx.origin][_colmeiaId];
     }
 
@@ -150,19 +148,17 @@ contract RegistrarProducao {
     }
 
     // Retorna os dados de uma produção passando o ID.
-    function getProductionById(uint256 _id)
-        public
-        view
-        returns (Production memory)
-    {
+    function getProductionById(
+        uint256 _id
+    ) public view returns (Production memory) {
         return productionList[tx.origin][_id];
     }
 
     // Registrar uma unidade de prouto beneficiado
-    function registerProduct(address _user, Honey memory _honey)
-        public
-        onlyOWNER(_user)
-    {
+    function registerProduct(
+        address _user,
+        Honey memory _honey
+    ) public onlyOWNER(_user) {
         require(
             product[_user][_honey.codigo].codigo == 0,
             "Codigo do produto ja cadastrado"
@@ -180,10 +176,10 @@ contract RegistrarProducao {
         productCode.push(_honey.codigo);
     }
 
-    function registerProduct2(Honey memory _honey, address _user)
-        public
-        onlyOWNER(_user)
-    {
+    function registerProduct2(
+        Honey memory _honey,
+        address _user
+    ) public onlyOWNER(_user) {
         require(
             product[_user][_honey.codigo].codigo == 0,
             "Codigo do produto ja cadastrado"
@@ -202,10 +198,10 @@ contract RegistrarProducao {
     }
 
     // Registrar uma lista de produtos beneficiados e adicionar o lote do produto
-    function registerProductList(Honey[] memory _honey, address _user)
-        public
-        returns (string memory)
-    {
+    function registerProductList(
+        Honey[] memory _honey,
+        address _user
+    ) public returns (string memory) {
         for (uint256 i = 0; i < _honey.length; i++) {
             registerProduct2(_honey[i], _user);
         }
@@ -222,11 +218,9 @@ contract RegistrarProducao {
         return honey;
     }
 
-    function listProductBatch(uint256 _batch)
-        public
-        view
-        returns (Honey[] memory)
-    {
+    function listProductBatch(
+        uint256 _batch
+    ) public view returns (Honey[] memory) {
         Honey[] memory honey = new Honey[](productCode.length);
         for (uint256 i = 0; i < productCode.length; i++) {
             if (product[msg.sender][productCode[i]].lote == _batch)
@@ -236,11 +230,9 @@ contract RegistrarProducao {
     }
 
     // Retorna um produto da lista passando o codigo do produto
-    function getProductById(uint256 _codigo)
-        public
-        view
-        returns (Honey memory)
-    {
+    function getProductById(
+        uint256 _codigo
+    ) public view returns (Honey memory) {
         return product[msg.sender][_codigo];
     }
 
@@ -256,20 +248,20 @@ contract RegistrarProducao {
     }
 
     // Adiciona um address na lista de enderecos do produtor
-    function addOWNER(address[] memory _address, address _user)
-        public
-        onlyOWNER(_user)
-    {
+    function addOWNER(
+        address[] memory _address,
+        address _user
+    ) public onlyOWNER(_user) {
         for (uint256 i = 0; i < _address.length; i++) {
             OWNER[_address[i]] = true;
         }
     }
 
     // Remove um address da lista de enderecos do produtor
-    function remOWNER(address[] memory _address, address _user)
-        public
-        onlyOWNER(_user)
-    {
+    function remOWNER(
+        address[] memory _address,
+        address _user
+    ) public onlyOWNER(_user) {
         for (uint256 i = 0; i < _address.length; i++) {
             OWNER[_address[i]] = false;
         }

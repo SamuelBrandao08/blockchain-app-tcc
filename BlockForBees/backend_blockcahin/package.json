@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "migrations": "truffle migrate --network ganache"
+  },
   "dependencies": {
     "@truffle/hdwallet-provider": "^2.1.5"
   }
