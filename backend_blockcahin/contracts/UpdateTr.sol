@@ -7,7 +7,7 @@ contract UpdateTr {
 
     event Transfer(
         address indexed sender,
-        address indexed recipient,
+        address indexed receiver,
         bytes32 indexed unitId,
         string date,
         string businessUnitType,

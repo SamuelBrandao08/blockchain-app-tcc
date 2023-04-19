@@ -48,6 +48,36 @@ contract Merchant {
         _;
     }
 
+    function registerReceivedUnit(
+        bytes32 _id,
+        address _distributorId,
+        address _supplierId,
+        string memory _dateTime,
+        string memory _local,
+        address _addr
+    ) public onlyOWNER(_addr) {
+        receivedUnits[_id] = ReceivedUnit(
+            _id,
+            _distributorId,
+            _supplierId,
+            _dateTime,
+            _local
+        );
+        receivedUnitsId[_addr].push(_id);
+    }
+
+    function getReceivedUnit(
+        bytes32 _id
+    ) public view returns (ReceivedUnit memory) {
+        return receivedUnits[_id];
+    }
+
+    function getReceivedUnitId(
+        address _addr
+    ) public view returns (bytes32[] memory) {
+        return receivedUnitsId[_addr];
+    }
+
     function registerReceivedContainer(
         bytes32 _id,
         bytes32[] memory _units,

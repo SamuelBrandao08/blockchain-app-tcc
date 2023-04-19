@@ -29,14 +29,14 @@ struct Honey {
 }
 
 struct Box {
-    bytes32 id;
+    bytes31 id;
     bytes20 batch;
     bytes30[] honeyId;
 }
 
 struct Pallet {
     bytes32 id;
-    bytes32[] boxId;
+    bytes31[] boxId;
 }
 
 contract Processing {
@@ -50,9 +50,10 @@ contract Processing {
     mapping(bytes32 => Honey) honeys; // endereco => (codigo => Honey). Lista de produtos fabricados por cada processador de mel.
     mapping(address => bytes30[]) honeysId;
     mapping(address => bytes20[]) honeysBatch;
+    mapping(address => uint16) count;
 
-    mapping(bytes32 => Box) boxes; // endereco => (codigo => Container). Lista de conteiners(caixa ou palete) montados por cada processador de mel.
-    mapping(address => bytes32[]) boxesId;
+    mapping(bytes31 => Box) boxes; // endereco => (codigo => Container). Lista de conteiners(caixa ou palete) montados por cada processador de mel.
+    mapping(address => bytes31[]) boxesId;
 
     mapping(bytes32 => Pallet) pallets; // endereco => (codigo => Container). Lista de conteiners(caixa ou palete) montados por cada processador de mel.
     mapping(address => bytes32[]) palletsId;
@@ -241,37 +242,39 @@ contract Processing {
         address _addr,
         bytes20 _batch
     ) public onlyOWNER(_addr) returns (bytes32) {
-        bytes32 _id = bytes32(keccak256(abi.encodePacked(_honeyId)));
+        //bytes32 _id = bytes32(keccak256(abi.encodePacked(_honeyId)));
+        count[_addr]++;
+        bytes31 _id = bytes31(abi.encodePacked(_addr, count[_addr]));
         boxes[_id] = Box(_id, _batch, _honeyId);
         boxesId[_addr].push(_id);
         return _id;
     }
 
-    function getBox(bytes30 _id) public view returns (Box memory) {
+    function getBox(bytes31 _id) public view returns (Box memory) {
         return boxes[_id];
     }
 
-    function getBoxId(address _addr) public view returns (bytes32[] memory) {
+    function getBoxId(address _addr) public view returns (bytes31[] memory) {
         return boxesId[_addr];
     }
 
     function newPallet(
-        bytes32[] memory _honeyId,
+        bytes31[] memory _boxId,
         address _addr
     ) public onlyOWNER(_addr) returns (bytes32) {
-        bytes32 _id = keccak256(abi.encodePacked(_honeyId));
-        pallets[_id] = Pallet(_id, _honeyId);
+        bytes32 _id = keccak256(abi.encodePacked(_boxId));
+        pallets[_id] = Pallet(_id, _boxId);
         palletsId[_addr].push(_id);
         return _id;
     }
 
     // Fonções GET
-    function getPallet(bytes32 _id) public view returns (Box memory) {
-        return boxes[_id];
+    function getPallet(bytes32 _id) public view returns (Pallet memory) {
+        return pallets[_id];
     }
 
     function getPalletId(address _addr) public view returns (bytes32[] memory) {
-        return boxesId[_addr];
+        return palletsId[_addr];
     }
 
     //Função para registrar a tranzação de um produto
