@@ -25,12 +25,37 @@ export default function Login() {
       //const response = await api.post("session", { id });
 
       if (!context.active);
-      const response = await contract.methods
-        .login(name, password, context.account)
-        .call();
+      const userRole = await contract.methods.getTypeUser().call();
+      switch (userRole) {
+        case "productor":
+          var response = await contract.methods
+            .loginProductor(context.account, password)
+            .call();
+          break;
+        case "processor":
+          var response = await contract.methods
+            .loginProcessor(name, password, context.account)
+            .call();
+          break;
+        case "distributor":
+          var response = await contract.methods
+            .loginDistributor(name, password, context.account)
+            .call();
+          break;
+        case "merchant":
+          var response = await contract.methods
+            .loginMerchant(name, password, context.account)
+            .call();
+          break;
+
+        default:
+          alert("Usuario não encontrado!");
+          break;
+      }
+
       console.log("res ", response);
-      localStorage.setItem("userId", response.account);
-      localStorage.setItem("userRole", response.user);
+      localStorage.setItem("userId", response.addr);
+      localStorage.setItem("userRole", userRole);
       localStorage.setItem("userName", response.name);
 
       console.log("Usuario ", response);
@@ -46,11 +71,11 @@ export default function Login() {
         <form onSubmit={handleLogin}>
           <h1>Faça seu login!</h1>
 
-          <input
+          {/* <input
             placeholder="Nome de usario"
             value={name}
             onChange={(e) => setName(e.target.value)}
-          />
+          /> */}
           <input
             placeholder="Senha"
             value={password}

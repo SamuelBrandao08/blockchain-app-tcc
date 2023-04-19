@@ -14,17 +14,31 @@ import "./style.css";
 //var crypto = require("crypto");
 
 const options = Object.values(profileConstants).map((profile) => ({
-  value: profile,
-  label: profile.charAt(0).toUpperCase(),
+  label:
+    Object.keys(profile)[0].charAt(0).toUpperCase() +
+    Object.keys(profile)[0].slice(1),
+  value: Object.values(profile)[0],
 }));
-
+console.log(options);
 export default function Register() {
-  const [nome, setNome] = useState("");
-  const [password, setPassword] = useState("alunoufc");
-  const [cpf, setCpf] = useState("123123");
-  const [user, setUser] = useState("");
-  const [cidade, setCidade] = useState("mn");
-  const [email, setEmail] = useState("@email");
+  // string memory _type,
+  // address _addr,
+  // string memory _name,
+  // string memory _password,
+  // string memory _town,
+  // string memory _apiary,
+  // string memory _email,
+  // string memory _stablishment,
+  // string memory _certification
+
+  const [role, setRole] = useState("");
+  const [name, steName] = useState("");
+  const [password, setPassword] = useState("");
+  const [town, setTown] = useState("");
+  const [apiary, setApiary] = useState("");
+  const [email, setEmail] = useState("");
+  const [stablishment, setStablishment] = useState("");
+  const [certification, setCertification] = useState("");
 
   const history = useHistory();
   const context = useWeb3Context();
@@ -40,26 +54,27 @@ export default function Register() {
   async function handleRegister(e) {
     e.preventDefault();
     //setId(crypto.randomBytes(4).toString("HEX"));
-
-    const data = {
-      nome,
-      password,
-      cpf,
-      user,
-      cidade,
-      email,
-    };
     try {
       //const response = await api.post("apicultor", data);
 
-      console.log("user", user);
+      console.log("user", role);
       const response = await contract.methods
-        .registerUser(context.account, nome, password, cpf, user, cidade, email)
+        .register(
+          role,
+          context.account,
+          name,
+          password,
+          town,
+          apiary,
+          email,
+          stablishment,
+          certification
+        )
         .send({
           from: context.account,
         });
       console.log("Retorno: ", response);
-      alert(`Seu ID de acesso: ${response.id}`);
+      alert("Usuário cadastrado!");
 
       history.push("/");
     } catch (err) {
@@ -83,45 +98,57 @@ export default function Register() {
 
         <form onSubmit={handleRegister}>
           <input
-            placeholder="Nome"
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
+            placeholder="nome"
+            value={name}
+            onChange={(e) => steName(e.target.value)}
           />
           <input
-            placeholder="Password"
+            placeholder="Senha"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <input
-            placeholder="CPF"
-            value={cpf}
-            onChange={(e) => setCpf(e.target.value)}
-          />
-          <input
-            placeholder="tipo de usuario"
-            value={user}
-            onChange={(e) => setUser(e.target.value)}
-          />
           <Select
-            defaultValue={user}
-            onChange={(e) => setUser(e.value)}
+            defaultValue={role}
+            onChange={(e) => setRole(e.value)}
             options={options}
-            placeholder="Categoria"
+            placeholder="Tipo de usuário"
           />
-          <div className="input-group">
-            <input
-              placeholder="Cidade"
-              value={cidade}
-              onChange={(e) => setCidade(e.target.value)}
-            />
-            <input
-              type="email"
-              placeholder="E-mail"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
+          {role === "productor" && (
+            <>
+              <input
+                type="email"
+                placeholder="E-mail"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+              <input
+                placeholder="Cidade"
+                value={town}
+                onChange={(e) => setTown(e.target.value)}
+              />
 
+              <input
+                placeholder="Apiário"
+                value={apiary}
+                onChange={(e) => setApiary(e.target.value)}
+              />
+            </>
+          )}
+          {role === "processor" && (
+            <input
+              placeholder="Certificação"
+              value={certification}
+              onChange={(e) => setCertification(e.target.value)}
+            />
+          )}
+
+          {["processor", "merchant"].includes(role) && (
+            <input
+              placeholder="Estabelecimento"
+              value={stablishment}
+              onChange={(e) => setStablishment(e.target.value)}
+            />
+          )}
           <button className="button" type="submit">
             Cadastrar
           </button>

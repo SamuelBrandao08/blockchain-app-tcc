@@ -4,7 +4,7 @@ import ProductionTableRow from "../ProductionTableRow";
 
 // import { Container } from './styles';
 
-function Production({ productions, listProduct }) {
+function HoneyProduction({ productions, listProduct }) {
   console.log(listProduct);
   function generateTable() {
     if (!productions) return;
@@ -40,4 +40,4 @@ function Production({ productions, listProduct }) {
   );
 }
 
-export default Production;
+export default HoneyProduction;

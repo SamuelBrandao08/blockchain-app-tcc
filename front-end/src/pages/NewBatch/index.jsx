@@ -9,8 +9,8 @@ import api from "../../services/api";
 import "./style.css";
 import useContract from "../../hooks/useContract";
 
-import { abi } from "../../abi/RegistrarProducao.json";
-import { RegistrarProducao } from "../../abi/address.json";
+import { abi } from "../../abi/Production.json";
+import { Production } from "../../abi/address.json";
 import { useWeb3Context } from "web3-react";
 
 export default function NewBatch() {
@@ -24,7 +24,7 @@ export default function NewBatch() {
   const [unidades, setUnidades] = useState(0);
 
   const context = useWeb3Context();
-  const contract = useContract(abi, RegistrarProducao);
+  const contract = useContract(abi, Production);
   const history = useHistory();
   const userId = localStorage.getItem("userId");
   console.log("user ", typeof userId);

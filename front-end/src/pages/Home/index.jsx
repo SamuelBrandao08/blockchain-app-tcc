@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 //import { FiPower } from "react-icons/fi";
 import useContract from "../../hooks/useContract";
-import { abi } from "../../abi/RegistrarProducao.json";
-import { RegistrarProducao } from "../../abi/address.json";
+import { abi } from "../../abi/Production.json";
+import { Production } from "../../abi/address.json";
 
 import "./style.css";
 import api from "../../services/api";
@@ -23,18 +23,19 @@ export default function Home() {
   const [showMel, setShowMel] = useState(false);
 
   const context = useWeb3Context();
-  const contract = useContract(abi, RegistrarProducao);
+  const contract = useContract(abi, Production);
   console.log(context);
   const history = useHistory("");
 
   const userId = localStorage.getItem("userId");
   const userName = localStorage.getItem("userName");
   const userRole = localStorage.getItem("userRole");
+  console.log(userRole);
 
   useEffect(() => {
     (async function fetch() {
       if (contract) {
-        setProductions(await contract.methods.listProduction().call());
+        //setProductions(await contract.methods.listProduction().call());
       }
     })();
   }, [contract]);
@@ -112,8 +113,10 @@ export default function Home() {
 
   return (
     <div>
-      {userRole === profileConstants.PRODUCTOR && <HomeProdutor />}
-      {userRole === profileConstants.DISTRIBUTOR && <HomeDistribuidor />}
+      {userRole === profileConstants.PRODUCTOR.produtor && <HomeProdutor />}
+      {userRole === profileConstants.DISTRIBUTOR.distribuidor && (
+        <HomeDistribuidor />
+      )}
     </div>
     // <div className="profile-container">
     //   <header>

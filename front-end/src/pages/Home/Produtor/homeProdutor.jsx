@@ -2,15 +2,15 @@ import React, { useEffect, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 //import { FiPower } from "react-icons/fi";
 import useContract from "../../../hooks/useContract";
-import { abi } from "../../../abi/RegistrarProducao.json";
-import { RegistrarProducao } from "../../../abi/address.json";
+import { abi } from "../../../abi/Production.json";
+import { Production } from "../../../abi/address.json";
 
 import "./style.css";
 import api from "../../../services/api";
 import { useWeb3Context } from "web3-react";
 import ProductionTableRow from "../ProductionTableRow";
 import { FiArrowLeft } from "react-icons/fi";
-import Production from "./Production";
+import HoneyProduction from "./HoneyProduction";
 import Product from "./Product";
 import { useMemo } from "react";
 import Tracing from "../Tracing";
@@ -32,7 +32,7 @@ const HomeProdutor = () => {
 
   const contract = useMemo(() => {
     if (context.active) {
-      return new context.library.eth.Contract(abi, RegistrarProducao);
+      return new context.library.eth.Contract(abi, Production);
     }
     return null;
   }, [context.active]);
@@ -98,7 +98,10 @@ const HomeProdutor = () => {
       <main>
         <div>
           {!product.length && (
-            <Production productions={productions} listProduct={listProduct} />
+            <HoneyProduction
+              productions={productions}
+              listProduct={listProduct}
+            />
           )}
           {product.length && (
             <Product product={product} handleBack={() => setProduct([])} />

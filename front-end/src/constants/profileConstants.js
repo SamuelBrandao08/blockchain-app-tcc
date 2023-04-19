@@ -1,7 +1,7 @@
 export const profileConstants = Object.freeze({
-  SUPPLIER: "supplier",
-  PRODUCTOR: "produtor",
-  PROCESSOR: "processador",
-  DISTRIBUTOR: "distribuidor",
-  MERCHANT: "comerciante",
+  SUPPLIER: { fornecedor: "supplier" },
+  PRODUCTOR: { produtor: "productor" },
+  PROCESSOR: { processador: "processor" },
+  DISTRIBUTOR: { distribuidor: "distributor" },
+  MERCHANT: { comerciante: "merchant" },
 });
