@@ -12,8 +12,10 @@ import ProductionTableRow from "./ProductionTableRow";
 import MelTableRow from "./MelTableRow";
 import { FiArrowLeft } from "react-icons/fi";
 import { profileConstants } from "../../constants/profileConstants";
-import HomeProdutor from "./Produtor/homeProdutor";
-import HomeDistribuidor from "./Distribuidor/homeDistribuidor";
+import HomeProducer from "./Producer/homeProducer";
+import HomeDistributor from "./Distributor/homeDistributor";
+import HomeProcessor from "./Processor/homeProcessor";
+import HomeMerchant from "./Merchant/homeMerchant";
 
 export default function Home() {
   const [mel, setMel] = useState([]);
@@ -113,10 +115,10 @@ export default function Home() {
 
   return (
     <div>
-      {userRole === profileConstants.PRODUCTOR.produtor && <HomeProdutor />}
-      {userRole === profileConstants.DISTRIBUTOR.distribuidor && (
-        <HomeDistribuidor />
-      )}
+      {userRole === profileConstants.PRODUCER && <HomeProducer />}
+      {userRole === profileConstants.PROCESSOR && <HomeProcessor />}
+      {userRole === profileConstants.DISTRIBUTOR && <HomeDistributor />}
+      {userRole === profileConstants.MERCHANT && <HomeMerchant />}
     </div>
     // <div className="profile-container">
     //   <header>

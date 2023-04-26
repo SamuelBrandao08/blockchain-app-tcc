@@ -10,14 +10,13 @@ import { useWeb3Context } from "web3-react";
 import "./style.css";
 
 export default function Login() {
-  const [name, setName] = useState("");
+  const [login, setLogin] = useState("samuel");
   const [password, setPassword] = useState("alunoufc");
   const history = useHistory("");
 
   const context = useWeb3Context();
 
   const contract = useContract(abi, Authentication);
-
   async function handleLogin(e) {
     e.preventDefault();
 
@@ -25,41 +24,16 @@ export default function Login() {
       //const response = await api.post("session", { id });
 
       if (!context.active);
-      const userRole = await contract.methods.getTypeUser().call();
-      switch (userRole) {
-        case "productor":
-          var response = await contract.methods
-            .loginProductor(context.account, password)
-            .call();
-          break;
-        case "processor":
-          var response = await contract.methods
-            .loginProcessor(name, password, context.account)
-            .call();
-          break;
-        case "distributor":
-          var response = await contract.methods
-            .loginDistributor(name, password, context.account)
-            .call();
-          break;
-        case "merchant":
-          var response = await contract.methods
-            .loginMerchant(name, password, context.account)
-            .call();
-          break;
-
-        default:
-          alert("Usuario não encontrado!");
-          break;
+      const response = await contract.methods.logon(login, password).call();
+      console.log(response);
+      if (response.id !== "") {
+        localStorage.setItem("userId", response.id);
+        localStorage.setItem("userName", response.name);
+        localStorage.setItem("userRole", response.role);
+        history.push("/home");
+      } else {
+        alert("Usuario ou senha incoretos!");
       }
-
-      console.log("res ", response);
-      localStorage.setItem("userId", response.addr);
-      localStorage.setItem("userRole", userRole);
-      localStorage.setItem("userName", response.name);
-
-      console.log("Usuario ", response);
-      history.push("/home");
     } catch (err) {
       console.log(err);
       alert("Falha no login, tente novamente!");
@@ -69,21 +43,22 @@ export default function Login() {
     <div className="login-container">
       <section className="form">
         <form onSubmit={handleLogin}>
-          <h1>Faça seu login!</h1>
-
-          {/* <input
-            placeholder="Nome de usario"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-          /> */}
-          <input
-            placeholder="Senha"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <button className="button" type="submit">
-            Entrar
-          </button>
+          <div>
+            <label htmlFor="basic-url">Login</label>
+            <input
+              placeholder="Usuário"
+              value={login}
+              onChange={(e) => setLogin(e.target.value)}
+            />
+            <input
+              placeholder="Senha"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button className="button" type="submit">
+              Entrar
+            </button>
+          </div>
         </form>
 
         <Link className="back-link" to="/register">

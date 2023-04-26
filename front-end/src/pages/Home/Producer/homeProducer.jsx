@@ -15,7 +15,7 @@ import Product from "./Product";
 import { useMemo } from "react";
 import Tracing from "../Tracing";
 
-const HomeProdutor = () => {
+const HomeProducer = () => {
   const [productions, setProductions] = useState([]);
   const [product, setProduct] = useState([]);
 
@@ -149,4 +149,4 @@ const HomeProdutor = () => {
   );
 };
 
-export default HomeProdutor;
+export default HomeProducer;
