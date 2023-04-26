@@ -4,51 +4,51 @@ import "./Authentication.sol";
 import "./UpdateTr.sol";
 
 struct ReceivedUnit {
-    bytes32 id;
-    address distributorId;
-    address supplierId;
+    string id;
+    string distributorId;
+    string supplierId;
     string dateTime;
     string local;
 }
 
 struct ReceivedContainer {
-    bytes32 id;
-    bytes32[] units;
-    address supplierId;
+    string id;
+    string[] units;
+    string supplierId;
     string dateTime;
     string local;
 } // Logistc Unit Received
 
 struct DispatchedUnit {
-    bytes32 id;
-    address distributorId;
-    address receiverId;
+    string id;
+    string distributorId;
+    string receiverId;
     string date;
     string local;
 }
 
 struct DispachedContainer {
-    bytes32 id;
-    bytes32[] units;
-    address distributorId;
-    address receiverId;
+    string id;
+    string[] units;
+    string distributorId;
+    string receiverId;
     string date;
     string local;
 }
 
 contract Distributor {
     //Variaveis de estado
-    mapping(bytes32 => ReceivedUnit) receivedUnits; // Lista de containers recebidos para entrega por cada distribuidor.
-    mapping(address => bytes32[]) receivedUnitsId;
+    mapping(string => ReceivedUnit) receivedUnits; // Lista de containers recebidos para entrega por cada distribuidor.
+    mapping(string => string[]) receivedUnitsId;
 
-    mapping(bytes32 => ReceivedContainer) receivedContainers; // Lista de containers recebidos para entrega por cada distribuidor.
-    mapping(address => bytes32[]) receivedContainersId;
+    mapping(string => ReceivedContainer) receivedContainers; // Lista de containers recebidos para entrega por cada distribuidor.
+    mapping(string => string[]) receivedContainersId;
 
-    mapping(bytes32 => DispatchedUnit) dispatchedUnits; // Lista de containers recebidos para entrega por cada distribuidor.
-    mapping(address => bytes32[]) dispatchedUnitsId;
+    mapping(string => DispatchedUnit) dispatchedUnits; // Lista de containers recebidos para entrega por cada distribuidor.
+    mapping(string => string[]) dispatchedUnitsId;
 
-    mapping(bytes30 => DispachedContainer) dispatchedContainers; // Lista de containers recebidos para entrega por cada distribuidor.
-    mapping(address => bytes30[]) dispatchedContainersId;
+    mapping(string => DispachedContainer) dispatchedContainers; // Lista de containers recebidos para entrega por cada distribuidor.
+    mapping(string => string[]) dispatchedContainersId;
 
     address contractAuthentication;
     Authentication instanceAuthentication;
@@ -63,22 +63,22 @@ contract Distributor {
     }
 
     //Verifica se o endereço que esta chamando o contrato possui permisao para modificar o estado da rede
-    modifier onlyOWNER(address _addr) {
+    modifier onlyOWNER(string memory _userId) {
         require(
-            instanceAuthentication.activeUser(_addr) == true,
+            instanceAuthentication.activeUser(_userId) == true,
             "Permissao negada!"
         );
         _;
     }
 
     function registerReceivedUnit(
-        bytes32 _id,
-        address _distributorId,
-        address _supplierId,
+        string memory _id,
+        string memory _distributorId,
+        string memory _supplierId,
         string memory _dateTime,
         string memory _local,
-        address _addr
-    ) public onlyOWNER(_addr) {
+        string memory _userId
+    ) public onlyOWNER(_userId) {
         receivedUnits[_id] = ReceivedUnit(
             _id,
             _distributorId,
@@ -86,17 +86,17 @@ contract Distributor {
             _dateTime,
             _local
         );
-        receivedUnitsId[_addr].push(_id);
+        receivedUnitsId[_userId].push(_id);
     }
 
     function registerReceivedContainer(
-        bytes32 _id,
-        bytes32[] memory _units,
-        address _supplierId,
+        string memory _id,
+        string[] memory _units,
+        string memory _supplierId,
         string memory _dateTime,
         string memory _local,
-        address _addr
-    ) public onlyOWNER(_addr) {
+        string memory _userId
+    ) public onlyOWNER(_userId) {
         receivedContainers[_id] = ReceivedContainer(
             _id,
             _units,
@@ -104,29 +104,29 @@ contract Distributor {
             _dateTime,
             _local
         );
-        receivedContainersId[_addr].push(_id);
+        receivedContainersId[_userId].push(_id);
     }
 
     function getReceivedContainer(
-        bytes30 _id
+        string memory _id
     ) public view returns (ReceivedContainer memory) {
         return receivedContainers[_id];
     }
 
     function getReceivedContainerId(
-        address _addr
-    ) public view returns (bytes32[] memory) {
-        return receivedContainersId[_addr];
+        string memory _userId
+    ) public view returns (string[] memory) {
+        return receivedContainersId[_userId];
     }
 
     function registerDispachedUnit(
-        bytes32 _id,
-        address _distributorId,
-        address _receiverId,
+        string memory _id,
+        string memory _distributorId,
+        string memory _receiverId,
         string memory _dateTime,
         string memory _local,
-        address _addr
-    ) public onlyOWNER(_addr) {
+        string memory _userId
+    ) public onlyOWNER(_userId) {
         dispatchedUnits[_id] = DispatchedUnit(
             _id,
             _distributorId,
@@ -134,18 +134,18 @@ contract Distributor {
             _dateTime,
             _local
         );
-        dispatchedUnitsId[_addr].push(_id);
+        dispatchedUnitsId[_userId].push(_id);
     }
 
-    function registerDispachedContainer(
-        bytes30 _id,
-        bytes32[] memory _units,
-        address _distributorId,
-        address _receiverId,
+    function registerDispatchedContainer(
+        string memory _id,
+        string[] memory _units,
+        string memory _distributorId,
+        string memory _receiverId,
         string memory _date,
         string memory _local,
-        address _addr
-    ) public onlyOWNER(_addr) {
+        string memory _userId
+    ) public onlyOWNER(_userId) {
         dispatchedContainers[_id] = DispachedContainer(
             _id,
             _units,
@@ -154,30 +154,30 @@ contract Distributor {
             _date,
             _local
         );
-        dispatchedContainersId[_addr].push(_id);
+        dispatchedContainersId[_userId].push(_id);
     }
 
-    function getDispachedContainer(
-        bytes30 _id
+    function getDispatchedContainer(
+        string memory _id
     ) public view returns (DispachedContainer memory) {
         return dispatchedContainers[_id];
     }
 
-    function getDispachedContainerId(
-        address _addr
-    ) public view returns (bytes30[] memory) {
-        return dispatchedContainersId[_addr];
+    function getDispatchedContainerId(
+        string memory _userId
+    ) public view returns (string[] memory) {
+        return dispatchedContainersId[_userId];
     }
 
     //Função para registrar a tranzação de um produto
     function forwarding(
-        address _sender,
-        address _receiver,
-        bytes32 _unitId,
+        string memory _sender,
+        string memory _receiver,
+        string memory _unitId,
         string memory _date,
         string memory _businessUnitType,
         bytes memory _signature
-    ) public onlyOWNER(msg.sender) {
+    ) public onlyOWNER(_receiver) {
         //chamar funcao updateTr no contrato UpdateTr
         instanceUpdateTr.updateTr(
             _sender,

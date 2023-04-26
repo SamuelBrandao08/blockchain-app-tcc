@@ -3,21 +3,21 @@
 pragma solidity ^0.8.17;
 
 contract UpdateTr {
-    mapping(bytes32 => address) transactions;
+    mapping(string => string) transactions;
 
     event Transfer(
-        address indexed sender,
-        address indexed receiver,
-        bytes32 indexed unitId,
+        string indexed sender,
+        string indexed receiver,
+        string indexed unitId,
         string date,
         string businessUnitType,
         bytes signature
     );
 
     function updateTr(
-        address _sender,
-        address _receiver,
-        bytes32 _unitId,
+        string memory _sender,
+        string memory _receiver,
+        string memory _unitId,
         string memory _date,
         string memory _businessUnitType,
         bytes memory _signature

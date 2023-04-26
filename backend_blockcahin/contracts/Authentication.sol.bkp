@@ -1,0 +1,228 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.17;
+
+struct Company {
+    bytes20 gln;
+    string name;
+    string street;
+    string city;
+    string country;
+}
+
+struct Productor {
+    address addr;
+    bytes20 id;
+    string name;
+    Company company;
+    string login;
+    bytes20 password;
+}
+
+struct Processor {
+    address addr;
+    bytes20 id;
+    string name;
+    string certification;
+    Company company;
+    string login;
+    bytes20 password;
+}
+
+struct Distributor {
+    address addr;
+    bytes20 id;
+    string name;
+    Company company;
+    string login;
+    bytes20 password;
+}
+
+struct Merchant {
+    address addr;
+    bytes20 id;
+    string name;
+    Company company;
+    string login;
+    bytes20 password;
+}
+
+contract Authentication {
+    mapping(bytes20 => Productor) productors; // id => User
+    mapping(bytes20 => Processor) processors; // id => User
+    mapping(bytes20 => Distributor) distributors; // id => User
+    mapping(bytes20 => Merchant) merchants; // id => User
+
+    mapping(bytes20 => bool) users; // usuarios ativos com permissao de modificaçao
+    mapping(bytes20 => string) typeUsers; // id => tipo de usuario
+
+    modifier onlyOWNER(bytes20 _id) {
+        require(users[_id] == true, "Permissao negada!");
+        _;
+    }
+
+    function register(
+        string memory _type,
+        address _addr,
+        string memory _name,
+        string memory _password,
+        string memory _town,
+        string memory _apiary,
+        string memory _email,
+        string memory _stablishment,
+        string memory _certification
+    ) public returns (string memory) {
+        // Registrar o produtor
+        if (
+            keccak256(abi.encodePacked(_type)) ==
+            keccak256(abi.encodePacked("productor"))
+        ) {
+            require(
+                productors[_addr].addr ==
+                    0x0000000000000000000000000000000000000000,
+                "Produtor ja cadastrado"
+            );
+            bytes32 passwd = keccak256(abi.encodePacked(_addr, _password));
+            productors[_addr] = Productor(
+                _addr,
+                _name,
+                passwd,
+                _town,
+                _apiary,
+                _email
+            );
+            users[_addr] = true;
+            typeUsers[_addr] = _type;
+            return string(abi.encodePacked(productors[_addr].addr));
+
+            // Registrar o processador
+        } else if (
+            keccak256(abi.encodePacked(_type)) ==
+            keccak256(abi.encodePacked("processor"))
+        ) {
+            require(
+                processors[_addr].addr ==
+                    0x0000000000000000000000000000000000000000,
+                "Processador ja cadastrado"
+            );
+            bytes32 passwd = keccak256(abi.encodePacked(_addr, _password));
+            processors[_addr] = Processor(
+                _addr,
+                _name,
+                passwd,
+                _stablishment,
+                _certification
+            );
+            users[_addr] = true;
+            typeUsers[_addr] = _type;
+            return string(abi.encodePacked(processors[_addr].addr));
+
+            // Registrar o distribuidor
+        } else if (
+            keccak256(abi.encodePacked(_type)) ==
+            keccak256(abi.encodePacked("distributor"))
+        ) {
+            require(
+                distributors[_addr].addr ==
+                    0x0000000000000000000000000000000000000000,
+                "Distribuidor ja cadastrado"
+            );
+            bytes32 passwd = keccak256(abi.encodePacked(_addr, _password));
+            distributors[_addr] = Distributor(_addr, _name, passwd);
+            users[_addr] = true;
+            typeUsers[_addr] = _type;
+            return string(abi.encodePacked(processors[_addr].addr));
+        } else if (
+            keccak256(abi.encodePacked(_type)) ==
+            keccak256(abi.encodePacked("merchant"))
+        ) {
+            require(
+                merchants[_addr].addr ==
+                    0x0000000000000000000000000000000000000000,
+                "Comerciante ja cadastrado"
+            );
+            bytes32 passwd = keccak256(abi.encodePacked(_addr, _password));
+            merchants[_addr] = Merchant(_addr, _name, passwd, _stablishment);
+            users[_addr] = true;
+            typeUsers[_addr] = _type;
+            return string(abi.encodePacked(merchants[_addr].addr));
+        } else {
+            revert("Erro no cadastro!");
+        }
+    }
+
+    function getProductor() public view returns (Productor memory) {
+        return productors[msg.sender];
+    }
+
+    function getProcessor() public view returns (Processor memory) {
+        return processors[msg.sender];
+    }
+
+    function getDistributor() public view returns (Distributor memory) {
+        return distributors[msg.sender];
+    }
+
+    function getMerchant() public view returns (Merchant memory) {
+        return merchants[msg.sender];
+    }
+
+    function getTypeUser() public view returns (string memory) {
+        return typeUsers[msg.sender];
+    }
+
+    function activeUser(address _addr) public view returns (bool) {
+        return users[_addr];
+    }
+
+    function loginProductor(
+        address _addr,
+        string memory _password
+    ) public view returns (Productor memory) {
+        require(
+            keccak256(abi.encodePacked(_addr, _password)) ==
+                productors[_addr].password,
+            "Usuario ou senha incorreto."
+        );
+
+        return productors[_addr];
+    }
+
+    function loginProcessor(
+        address _addr,
+        string memory _password
+    ) public view returns (Processor memory) {
+        require(
+            keccak256(abi.encodePacked(_addr, _password)) ==
+                processors[_addr].password,
+            "Usuario ou senha incorreto."
+        );
+
+        return processors[_addr];
+    }
+
+    function loginDistributor(
+        address _addr,
+        string memory _password
+    ) public view returns (Distributor memory) {
+        require(
+            keccak256(abi.encodePacked(_addr, _password)) ==
+                distributors[_addr].password,
+            "Usuario ou senha incorreto."
+        );
+
+        return distributors[_addr];
+    }
+
+    function loginMerchant(
+        address _addr,
+        string memory _password
+    ) public view returns (Merchant memory) {
+        require(
+            keccak256(abi.encodePacked(_addr, _password)) ==
+                merchants[_addr].password,
+            "Usuario ou senha incorreto."
+        );
+
+        return merchants[_addr];
+    }
+}

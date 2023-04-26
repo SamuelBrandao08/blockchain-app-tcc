@@ -5,27 +5,27 @@ import "./Authentication.sol";
 import "./UpdateTr.sol";
 
 struct Hive {
-    uint256 hiveId;
+    string hiveId;
     uint16 weightHoney;
     string dateCollect;
 }
 
-struct Tun {
-    bytes30 id;
-    bytes20 batch;
-    address productorId;
+struct Drum {
+    string id;
+    string batch;
+    string productorId;
     string apiary;
     uint64 weight;
     string packing;
     string flowering;
     string date;
-    uint256[] hivesId;
+    string[] hivesId;
 }
 
-struct Container {
-    bytes32 id;
-    bytes20 batch;
-    bytes30[] tunId;
+struct Pallet {
+    string id;
+    string batch;
+    string[] tunId;
 }
 
 // struct Honey {
@@ -39,15 +39,15 @@ struct Container {
 // }
 
 contract Production {
-    mapping(uint256 => Hive) hives;
-    mapping(address => uint256[]) hiveId;
+    mapping(string => Hive) hives;
+    mapping(string => string[]) hiveId;
 
-    mapping(bytes30 => Tun) tunList;
-    mapping(address => bytes30[]) tunListId;
-    mapping(address => bytes20[]) tunBatch;
+    mapping(string => Drum) drums;
+    mapping(string => string[]) drumsId;
+    mapping(string => string[]) drumsBatch;
 
-    mapping(bytes32 => Container) containerList;
-    mapping(address => bytes32[]) containerListId;
+    mapping(string => Pallet) pallets;
+    mapping(string => string[]) palletsId;
 
     // mapping(address => mapping(uint256 => Honey)) product;
     // uint256[] productCode;
@@ -65,15 +65,15 @@ contract Production {
     }
 
     //Verifica se o endereço que esta chamando o contrato possui permisao para modificar o estado da rede
-    modifier onlyOWNER(address _addr) {
+    modifier onlyOWNER(string memory _id) {
         require(
-            instanceAuthentication.activeUser(_addr) == true,
+            instanceAuthentication.activeUser(_id) == true,
             "Permissao negada!"
         );
         _;
     }
 
-    event UpdateHive(address indexed addr, Hive[] indexed hives);
+    event UpdateHive(string indexed _id, Hive[] indexed hives);
     event Collect(
         address indexed addr,
         uint256 hiveId,
@@ -82,41 +82,42 @@ contract Production {
     );
 
     function updateHive(
-        address _addr,
+        string memory _id,
         Hive[] memory _hives
-    ) public onlyOWNER(_addr) {
-        emit UpdateHive(_addr, _hives);
+    ) public onlyOWNER(_id) {
+        emit UpdateHive(_id, _hives);
     }
 
     function generateBatch(
-        address _addr,
-        string memory _apiary,
+        string memory _userId,
         string memory _flowering,
         string memory _date
-    ) public onlyOWNER(_addr) returns (bytes20) {
-        bytes20 _batch = ripemd160(
-            abi.encodePacked(_addr, _apiary, _flowering, _date)
+    ) public onlyOWNER(_userId) returns (string memory) {
+        bytes4 _hash = bytes4(
+            keccak256(abi.encodePacked(_userId, _flowering, _date))
         );
-        tunBatch[_addr].push(_batch);
+        string memory _batch = string(abi.encodePacked(_userId, _hash));
+
+        drumsBatch[_userId].push(_batch);
         return _batch;
     }
 
     function newTun(
-        address _addr,
-        bytes20 _batch,
+        string memory _userId,
+        string memory _batch,
         string memory _apiary,
         uint64 _weight,
         string memory _packing,
         string memory _flowering,
         string memory _dateTime,
-        uint256[] memory _hivesId
-    ) public onlyOWNER(_addr) returns (bytes30) {
-        bytes30 _id = bytes30(abi.encodePacked(_batch, _dateTime));
+        string[] memory _hivesId
+    ) public onlyOWNER(_userId) returns (string memory) {
+        string memory _id = string(abi.encodePacked(_batch, _dateTime));
 
-        tunList[_id] = Tun(
+        drums[_id] = Drum(
             _id,
             _batch,
-            _addr,
+            _userId,
             _apiary,
             _weight,
             _packing,
@@ -124,49 +125,51 @@ contract Production {
             _dateTime,
             _hivesId
         );
-        tunListId[_addr].push(_id);
-        return tunList[_id].id;
+        drumsId[_userId].push(_id);
+        return drums[_id].id;
     }
 
-    function getTun(bytes30 _id) public view returns (Tun memory) {
-        return tunList[_id];
+    function getDrum(string memory _id) public view returns (Drum memory) {
+        return drums[_id];
     }
 
-    function getTunId(address _addr) public view returns (bytes30[] memory) {
-        return tunListId[_addr];
+    function getDrumId(
+        string memory _userId
+    ) public view returns (string[] memory) {
+        return drumsId[_userId];
     }
 
-    function newContainer(
-        address _addr,
-        bytes20 _batch,
-        bytes30[] memory _tunId
-    ) public onlyOWNER(_addr) returns (bytes32) {
-        bytes12 _hash = bytes12(keccak256(abi.encodePacked(_tunId)));
-        bytes32 _id = bytes32(abi.encodePacked(_addr, _hash));
-        containerList[_id] = Container(_id, _batch, _tunId);
-        containerListId[_addr].push(_id);
+    function newPallet(
+        string memory _userId,
+        string memory _batch,
+        string[] memory _drumId
+    ) public onlyOWNER(_userId) returns (string memory) {
+        bytes16 _hash = bytes16(keccak256(abi.encode(_drumId)));
+        string memory _id = string(abi.encodePacked(_userId, _hash));
+        pallets[_id] = Pallet(_id, _batch, _drumId);
+        palletsId[_userId].push(_id);
         return _id;
     }
 
-    function getContainer(bytes32 _id) public view returns (Container memory) {
-        return containerList[_id];
+    function getPallet(string memory _id) public view returns (Pallet memory) {
+        return pallets[_id];
     }
 
-    function getContainersId(
-        address _addr
-    ) public view returns (bytes32[] memory) {
-        return containerListId[_addr];
+    function getPalletsId(
+        string memory _userId
+    ) public view returns (string[] memory) {
+        return palletsId[_userId];
     }
 
     //Função para registrar a tranzação de um produto
     function forwarding(
-        address _sender,
-        address _receiver,
-        bytes32 _unitId,
+        string memory _sender,
+        string memory _receiver,
+        string memory _unitId,
         string memory _date,
         string memory _businessUnitType,
         bytes memory _signature
-    ) public onlyOWNER(msg.sender) {
+    ) public onlyOWNER(_receiver) {
         //chamar funcao updateTr no contrato UpdateTr
         instanceUpdateTr.updateTr(
             _sender,

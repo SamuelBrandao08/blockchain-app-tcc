@@ -4,22 +4,22 @@ import "./Authentication.sol";
 import "./UpdateTr.sol";
 
 struct Feedstock {
-    bytes30 id;
-    bytes32 supplier;
+    string id;
+    string distributorId;
     string dateTime;
 }
 
 struct FeedstockContainer {
-    bytes32 id;
-    bytes30[] feedstockIds;
-    bytes32 supplier;
+    string id;
+    string[] feedstockIds;
+    string distributorId;
     string dateTime;
 }
 
 struct Honey {
-    bytes30 id;
-    bytes20 batch;
-    bytes20 feedstockBatch;
+    string id;
+    string batch;
+    string feedstockBatch;
     string honeyType;
     string variety;
     uint64 weight;
@@ -29,35 +29,35 @@ struct Honey {
 }
 
 struct Box {
-    bytes31 id;
-    bytes20 batch;
-    bytes30[] honeyId;
+    string id;
+    string batch;
+    string[] honeyId;
 }
 
 struct Pallet {
-    bytes32 id;
-    bytes31[] boxId;
+    string id;
+    string[] boxId;
 }
 
 contract Processing {
     // Variaveis de estado
-    mapping(bytes32 => Feedstock) feedstocks; // endereco => (codigo => carregamento). lista de materia prima recebida por cada processador de mel.
-    mapping(address => bytes32[]) feedstocksId;
+    mapping(string => Feedstock) feedstocks; // endereco => (codigo => carregamento). lista de materia prima recebida por cada processador de mel.
+    mapping(string => string[]) feedstocksId;
 
-    mapping(bytes30 => FeedstockContainer) feedstockContainers; // endereco => (codigo => carregamento). lista de materia prima recebida por cada processador de mel.
-    mapping(address => bytes30[]) feedstockContainersId;
+    mapping(string => FeedstockContainer) feedstockContainers; // endereco => (codigo => carregamento). lista de materia prima recebida por cada processador de mel.
+    mapping(string => string[]) feedstockContainersId;
 
-    mapping(bytes32 => Honey) honeys; // endereco => (codigo => Honey). Lista de produtos fabricados por cada processador de mel.
-    mapping(address => bytes30[]) honeysId;
-    mapping(address => bytes20[]) honeysBatch;
-    mapping(address => uint16) count;
+    mapping(string => Honey) honeys; // honey id => Honey. Lista de produtos fabricados por cada processador de mel.
+    mapping(string => string[]) honeysId; // user id => honey id []
+    mapping(string => string[]) honeysBatch; // user id => batch[]
+    mapping(string => uint32) count; // batch => counter
 
-    mapping(bytes31 => Box) boxes; // endereco => (codigo => Container). Lista de conteiners(caixa ou palete) montados por cada processador de mel.
-    mapping(address => bytes31[]) boxesId;
+    mapping(string => Box) boxes; // endereco => (codigo => Container). Lista de conteiners(caixa ou palete) montados por cada processador de mel.
+    mapping(string => string[]) boxesId;
 
-    mapping(bytes32 => Pallet) pallets; // endereco => (codigo => Container). Lista de conteiners(caixa ou palete) montados por cada processador de mel.
-    mapping(address => bytes32[]) palletsId;
-    mapping(address => bytes20[]) palletsBatch;
+    mapping(string => Pallet) pallets; // endereco => (codigo => Container). Lista de conteiners(caixa ou palete) montados por cada processador de mel.
+    mapping(string => string[]) palletsId;
+    //mapping(string => string[]) palletsBatch;
 
     address contractAuthentication;
     Authentication instanceAuthentication;
@@ -72,9 +72,9 @@ contract Processing {
     }
 
     //Verifica se o endereço que esta chamando o contrato possui permisao para modificar o estado da rede
-    modifier onlyOWNER(address _addr) {
+    modifier onlyOWNER(string memory _userId) {
         require(
-            instanceAuthentication.activeUser(_addr) == true,
+            instanceAuthentication.activeUser(_userId) == true,
             "Permissao negada!"
         );
         _;
@@ -82,135 +82,124 @@ contract Processing {
 
     // Funções relacionadas ao mel recebido pelos processadores
     function regiterFeedstock(
-        bytes30 _id,
-        bytes32 _supplier,
+        string memory _id,
+        string memory _distributorId,
         string memory _date,
-        address _addr
-    ) public onlyOWNER(_addr) {
-        feedstocks[_id] = Feedstock(_id, _supplier, _date);
-        feedstocksId[_addr].push(_id);
+        string memory _userId
+    ) public onlyOWNER(_userId) {
+        feedstocks[_id] = Feedstock(_id, _distributorId, _date);
+        feedstocksId[_userId].push(_id);
     }
 
     // Funcoes GET
-    function getFeedstock(bytes32 _id) public view returns (Feedstock memory) {
+    function getFeedstock(
+        string memory _id
+    ) public view returns (Feedstock memory) {
         return feedstocks[_id];
     }
 
     function getFeedstockId(
-        address _addr
-    ) public view returns (bytes32[] memory) {
-        return feedstocksId[_addr];
+        string memory _userId
+    ) public view returns (string[] memory) {
+        return feedstocksId[_userId];
     }
 
     function regiterFeedstockContainer(
-        bytes30 _id,
-        bytes30[] memory _feedstockIds,
-        bytes32 _supplier,
+        string memory _id,
+        string[] memory _feedstockIds,
+        string memory _distributorId,
         string memory _date,
-        address _addr
-    ) public onlyOWNER(_addr) {
+        string memory _userId
+    ) public onlyOWNER(_userId) {
         feedstockContainers[_id] = FeedstockContainer(
             _id,
             _feedstockIds,
-            _supplier,
+            _distributorId,
             _date
         );
-        feedstockContainersId[_addr].push(_id);
+        feedstockContainersId[_userId].push(_id);
     }
 
     // Funcoes GET
     function getFeedstockContainer(
-        bytes30 _id
+        string memory _id
     ) public view returns (FeedstockContainer memory) {
         return feedstockContainers[_id];
     }
 
     function getFeedstockContainerId(
-        address _addr
-    ) public view returns (bytes30[] memory) {
-        return feedstockContainersId[_addr];
+        string memory _userId
+    ) public view returns (string[] memory) {
+        return feedstockContainersId[_userId];
     }
 
     // Funções relacionadas ao mel beneficiado produzido pelos processadores
 
     function generateBatch(
-        address _addr,
-        bytes20 _feedstockBatch,
+        string memory _userId,
+        string memory _feedstockBatch,
         string memory _honeyType,
         string memory _variety,
         uint64 _weight,
-        string memory _date
-    ) public returns (bytes20) {
-        bytes20 _batch = ripemd160(
-            abi.encodePacked(
-                _addr,
-                _feedstockBatch,
-                _honeyType,
-                _variety,
-                _weight,
-                _date
+        string memory _dateTime
+    ) public returns (string memory) {
+        bytes4 _hash = bytes4(
+            keccak256(
+                abi.encodePacked(
+                    _userId,
+                    _feedstockBatch,
+                    _honeyType,
+                    _variety,
+                    _weight,
+                    _dateTime
+                )
             )
         );
-
-        honeysBatch[_addr].push(_batch);
+        string memory _batch = string(abi.encodePacked(_userId, _hash));
+        honeysBatch[_userId].push(_batch);
         return _batch;
     }
 
     function newHoney(
-        bytes20 _batch,
-        bytes20 _feedstockBatch,
-        string memory _honeyType,
-        string memory _variety,
-        uint64 _weight,
-        string memory _pacaging,
-        string memory _validity,
-        string memory _composition,
-        string memory _dateTime,
-        address _addr
-    ) public onlyOWNER(_addr) returns (bytes30) {
-        bytes30 _id = bytes30(abi.encodePacked(_batch, _dateTime));
+        Honey memory _honey,
+        string memory _userId
+    ) public onlyOWNER(_userId) returns (string memory) {
+        uint32 _count = count[_honey.batch]++;
+        string memory _id = string(abi.encodePacked(_honey.batch, _count));
+        //string memory _id = string(abi.encodePacked(_batch, _dateTime));
         honeys[_id] = Honey(
             _id,
-            _batch,
-            _feedstockBatch,
-            _honeyType,
-            _variety,
-            _weight,
-            _pacaging,
-            _validity,
-            _composition
-        );
-        honeysId[_addr].push(_id);
-        return _id;
-    }
-
-    // bytes20 _feedstockBatch,
-    // string memory _honeyType,
-    // string memory _variety,
-    // uint64 _weight,
-    // string memory _packaging,
-    // string memory _validity,
-    // string memory _composition,
-    // string memory _date,
-    // string memory _time,
-    function newHoneys(
-        Honey memory _honey,
-        string memory _date,
-        string memory _time,
-        uint _amount,
-        address _addr
-    ) public onlyOWNER(_addr) returns (bytes30[] memory id) {
-        bytes20 _batch = generateBatch(
-            _addr,
+            _honey.batch,
             _honey.feedstockBatch,
             _honey.honeyType,
             _honey.variety,
             _honey.weight,
-            _date
+            _honey.packaging,
+            _honey.validity,
+            _honey.composition
+        );
+        honeysId[_userId].push(_id);
+        return _id;
+    }
+
+    function newHoneys(
+        Honey memory _honey,
+        string memory _dateTime,
+        uint _amount,
+        string memory _userId
+    ) public onlyOWNER(_userId) returns (string[] memory id) {
+        string memory _batch = generateBatch(
+            _userId,
+            _honey.feedstockBatch,
+            _honey.honeyType,
+            _honey.variety,
+            _honey.weight,
+            _dateTime
         );
 
         for (uint256 index = 0; index < _amount; index++) {
-            bytes30 _id = bytes30(abi.encodePacked(_batch, _date, _time));
+            uint32 _count = count[_batch]++;
+            string memory _id = string(abi.encodePacked(_batch, _count));
             honeys[_id] = Honey(
                 _id,
                 _batch,
@@ -222,70 +211,79 @@ contract Processing {
                 _honey.validity,
                 _honey.composition
             );
-            honeysId[_addr].push(_id);
-            id[index] = bytes30(_id);
+            honeysId[_userId].push(_id);
+            id[index] = _id;
         }
         return id;
     }
 
-    function getHoney(bytes30 _id) public view returns (Honey memory) {
+    function getHoney(string memory _id) public view returns (Honey memory) {
         return honeys[_id];
     }
 
-    function getHoneyId(address _addr) public view returns (bytes30[] memory) {
-        return honeysId[_addr];
+    function getHoneyId(
+        string memory _userId
+    ) public view returns (string[] memory) {
+        return honeysId[_userId];
     }
 
     // Funções relacionadas aos containeres de mel produzidos pelos processadores
     function newBox(
-        bytes30[] memory _honeyId,
-        address _addr,
-        bytes20 _batch
-    ) public onlyOWNER(_addr) returns (bytes32) {
+        string[] memory _honeyId,
+        string memory _userId,
+        string memory _batch,
+        string memory _dateTime
+    ) public onlyOWNER(_userId) returns (string memory) {
         //bytes32 _id = bytes32(keccak256(abi.encodePacked(_honeyId)));
-        count[_addr]++;
-        bytes31 _id = bytes31(abi.encodePacked(_addr, count[_addr]));
+
+        string memory _id = string(abi.encodePacked(_batch, _dateTime));
         boxes[_id] = Box(_id, _batch, _honeyId);
-        boxesId[_addr].push(_id);
+        boxesId[_userId].push(_id);
         return _id;
     }
 
-    function getBox(bytes31 _id) public view returns (Box memory) {
+    function getBox(string memory _id) public view returns (Box memory) {
         return boxes[_id];
     }
 
-    function getBoxId(address _addr) public view returns (bytes31[] memory) {
-        return boxesId[_addr];
+    function getBoxId(
+        string memory _userId
+    ) public view returns (string[] memory) {
+        return boxesId[_userId];
     }
 
     function newPallet(
-        bytes31[] memory _boxId,
-        address _addr
-    ) public onlyOWNER(_addr) returns (bytes32) {
-        bytes32 _id = keccak256(abi.encodePacked(_boxId));
+        string[] memory _boxId,
+        string memory _userId
+    ) public onlyOWNER(_userId) returns (string memory) {
+        //string memory _id = string(abi.encodePacked(keccak256(abi.encode(_boxId))));
+        bytes16 _hash = bytes16(keccak256(abi.encode(_boxId)));
+        string memory _id = string(abi.encodePacked(_userId, _hash));
         pallets[_id] = Pallet(_id, _boxId);
-        palletsId[_addr].push(_id);
+        palletsId[_userId].push(_id);
         return _id;
     }
 
     // Fonções GET
-    function getPallet(bytes32 _id) public view returns (Pallet memory) {
+    function getPallet(string memory _id) public view returns (Pallet memory) {
         return pallets[_id];
     }
 
-    function getPalletId(address _addr) public view returns (bytes32[] memory) {
-        return palletsId[_addr];
+    function getPalletId(
+        string memory _userId
+    ) public view returns (string[] memory) {
+        return palletsId[_userId];
     }
 
     //Função para registrar a tranzação de um produto
     function forwarding(
-        address _sender,
-        address _receiver,
-        bytes32 _unitId,
+        string memory _sender,
+        string memory _receiver,
+        string memory _unitId,
         string memory _date,
         string memory _businessUnitType,
         bytes memory _signature
-    ) public onlyOWNER(msg.sender) {
+    ) public onlyOWNER(_receiver) {
         //chamar funcao updateTr no contrato UpdateTr
         instanceUpdateTr.updateTr(
             _sender,

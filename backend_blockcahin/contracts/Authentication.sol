@@ -1,227 +1,130 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+struct Company {
+    string name;
+    string street;
+    string city;
+    string country;
+}
+
+struct User {
+    address addr;
+    string id;
+    string name;
+    string certification;
+    Company company;
+    string role;
+}
+
 contract Authentication {
-    struct Productor {
-        address addr;
-        string name;
-        bytes32 password;
-        string town;
-        string apiary;
-        string email;
-    }
+    uint count;
+    mapping(string => User) users; // id => User
+    mapping(bytes32 => string) login; // password => id user
+    mapping(string => bool) status; // id => boolean. Usuarios ativos com permissao de modificaçao
 
-    struct Processor {
-        address addr;
-        string name;
-        bytes32 password;
-        string establishment;
-        string certification;
-    }
-
-    struct Distributor {
-        address addr;
-        string name;
-        bytes32 password;
-    }
-
-    struct Merchant {
-        address addr;
-        string name;
-        bytes32 password;
-        string stablishment;
-    }
-
-    mapping(address => Productor) productors; // id => User
-    mapping(address => Processor) processors; // id => User
-    mapping(address => Distributor) distributors; // id => User
-    mapping(address => Merchant) merchants; // id => User
-
-    mapping(address => bool) public users; // usuarios ativos com permissao de modificaçao
-    mapping(address => string) typeUsers; // id => tipo de usuario
-
-    //mapping(address => string) accounts; // account => id User
-    //mapping(address => string) usersType; // account => tipo de usuario
-
-    modifier onlyOWNER(address _addr) {
-        require(users[_addr] == true, "Permissao negada!");
+    modifier onlyOWNER(string memory _id) {
+        require(status[_id], "Permissao negada!");
         _;
     }
 
     function register(
-        string memory _type,
-        address _addr,
-        string memory _name,
-        string memory _password,
-        string memory _town,
-        string memory _apiary,
-        string memory _email,
-        string memory _stablishment,
-        string memory _certification
-    ) public returns (string memory) {
+        User memory _user,
+        string memory _login,
+        string memory _password
+    ) public returns (bool) {
         // Registrar o produtor
+        //string memory _id = generateId(_addr, _name, password, _date);
+        bytes32 password = keccak256(abi.encodePacked(_login, _password));
+        users[_user.id] = User(
+            _user.addr,
+            _user.id,
+            _user.name,
+            _user.certification,
+            Company(
+                _user.company.name,
+                _user.company.street,
+                _user.company.city,
+                _user.company.country
+            ),
+            _user.role
+        );
+        login[password] = _user.id;
+        status[_user.id] = true;
+        return true;
+    }
+
+    function getUser(string memory _id) public view returns (User memory) {
+        return users[_id];
+    }
+
+    function activeUser(string memory _id) public view returns (bool) {
+        return status[_id];
+    }
+
+    function removeUser(
+        string memory _id
+    ) public onlyOWNER(_id) returns (string memory) {
+        status[_id] = false;
+        return "Usuario removido";
+    }
+
+    function logon(
+        string memory _user,
+        string memory _password
+    ) public view returns (User memory, bool) {
+        bytes32 password = keccak256(abi.encodePacked(_user, _password));
+        string memory id = login[password];
+        require(status[id], "Falha no login!");
+        return (users[id], true);
+    }
+
+    function verifyPassword(
+        string memory _user,
+        string memory _password
+    ) public view returns (bool) {
+        bytes32 password = keccak256(abi.encodePacked(_user, _password));
         if (
-            keccak256(abi.encodePacked(_type)) ==
-            keccak256(abi.encodePacked("productor"))
+            keccak256(abi.encodePacked(login[password])) ==
+            keccak256(abi.encodePacked(""))
         ) {
-            require(
-                productors[_addr].addr ==
-                    0x0000000000000000000000000000000000000000,
-                "Produtor ja cadastrado"
-            );
-            bytes32 passwd = keccak256(abi.encodePacked(_addr, _password));
-            productors[_addr] = Productor(
-                _addr,
-                _name,
-                passwd,
-                _town,
-                _apiary,
-                _email
-            );
-            users[_addr] = true;
-            typeUsers[_addr] = _type;
-            return string(abi.encodePacked(productors[_addr].addr));
-
-            // Registrar o processador
-        } else if (
-            keccak256(abi.encodePacked(_type)) ==
-            keccak256(abi.encodePacked("processor"))
-        ) {
-            require(
-                processors[_addr].addr ==
-                    0x0000000000000000000000000000000000000000,
-                "Processador ja cadastrado"
-            );
-            bytes32 passwd = keccak256(abi.encodePacked(_addr, _password));
-            processors[_addr] = Processor(
-                _addr,
-                _name,
-                passwd,
-                _stablishment,
-                _certification
-            );
-            users[_addr] = true;
-            typeUsers[_addr] = _type;
-            return string(abi.encodePacked(processors[_addr].addr));
-
-            // Registrar o distribuidor
-        } else if (
-            keccak256(abi.encodePacked(_type)) ==
-            keccak256(abi.encodePacked("distributor"))
-        ) {
-            require(
-                distributors[_addr].addr ==
-                    0x0000000000000000000000000000000000000000,
-                "Distribuidor ja cadastrado"
-            );
-            bytes32 passwd = keccak256(abi.encodePacked(_addr, _password));
-            distributors[_addr] = Distributor(_addr, _name, passwd);
-            users[_addr] = true;
-            typeUsers[_addr] = _type;
-            return string(abi.encodePacked(processors[_addr].addr));
-        } else if (
-            keccak256(abi.encodePacked(_type)) ==
-            keccak256(abi.encodePacked("merchant"))
-        ) {
-            require(
-                merchants[_addr].addr ==
-                    0x0000000000000000000000000000000000000000,
-                "Comerciante ja cadastrado"
-            );
-            bytes32 passwd = keccak256(abi.encodePacked(_addr, _password));
-            merchants[_addr] = Merchant(_addr, _name, passwd, _stablishment);
-            users[_addr] = true;
-            typeUsers[_addr] = _type;
-            return string(abi.encodePacked(merchants[_addr].addr));
+            return true;
         } else {
-            return "Erro no cadastro!";
+            return false;
         }
     }
-
-    function getProductor() public view returns (Productor memory) {
-        return productors[msg.sender];
-    }
-
-    function getProcessor() public view returns (Processor memory) {
-        return processors[msg.sender];
-    }
-
-    function getDistributor() public view returns (Distributor memory) {
-        return distributors[msg.sender];
-    }
-
-    function getMerchant() public view returns (Merchant memory) {
-        return merchants[msg.sender];
-    }
-
-    function getTypeUser() public view returns (string memory) {
-        return typeUsers[msg.sender];
-    }
-
-    function activeUser(address _addr) public view returns (bool) {
-        return users[_addr];
-    }
-
-    // function getUser(
-    //     string memory _id,
-    //     string memory _type
-    // ) public view returns (Productor memory, Processor memory) {
-    //     require(
-    //         keccak256(abi.encodePacked(users[_account].account)) ==
-    //             keccak256(abi.encodePacked(_account))
-    //     );
-    //     return users[_account];
-    // }
-
-    function loginProductor(
-        address _addr,
-        string memory _password
-    ) public view returns (Productor memory) {
-        require(
-            keccak256(abi.encodePacked(_addr, _password)) ==
-                productors[_addr].password,
-            "Usuario ou senha incorreto."
-        );
-
-        return productors[_addr];
-    }
-
-    function loginProcessor(
-        address _addr,
-        string memory _password
-    ) public view returns (Processor memory) {
-        require(
-            keccak256(abi.encodePacked(_addr, _password)) ==
-                processors[_addr].password,
-            "Usuario ou senha incorreto."
-        );
-
-        return processors[_addr];
-    }
-
-    function loginDistributor(
-        address _addr,
-        string memory _password
-    ) public view returns (Distributor memory) {
-        require(
-            keccak256(abi.encodePacked(_addr, _password)) ==
-                distributors[_addr].password,
-            "Usuario ou senha incorreto."
-        );
-
-        return distributors[_addr];
-    }
-
-    function loginMerchant(
-        address _addr,
-        string memory _password
-    ) public view returns (Merchant memory) {
-        require(
-            keccak256(abi.encodePacked(_addr, _password)) ==
-                merchants[_addr].password,
-            "Usuario ou senha incorreto."
-        );
-
-        return merchants[_addr];
-    }
 }
+// function generateId(
+//     address _addr,
+//     string memory _name,
+//     bytes32 _password,
+//     string memory _date
+// ) internal view returns (string memory) {
+//     uint hashDigits = 6;
+//     uint hashModulus = 10 ** hashDigits;
+//     uint random = uint(
+//         keccak256(
+//             abi.encodePacked(_addr, _name, _password, block.timestamp)
+//         )
+//     );
+//     uint result = random % hashModulus;
+//     string memory resultString = uintToString(result);
+
+//     return string(abi.encodePacked(resultString, _date));
+// }
+
+// function uintToString(uint v) internal pure returns (string memory str) {
+//     uint maxlength = 100;
+//     bytes memory reversed = new bytes(maxlength);
+//     uint i = 0;
+//     while (v != 0) {
+//         uint remainder = v % 10;
+//         v = v / 10;
+//         reversed[i++] = bytes1(uint8(48 + remainder));
+//     }
+//     bytes memory s = new bytes(i);
+//     for (uint j = 0; j < i; j++) {
+//         s[j] = reversed[i - 1 - j];
+//     }
+//     return str = string(s);
+// }

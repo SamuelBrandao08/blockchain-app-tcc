@@ -18,7 +18,7 @@ module.exports = {
           mnemonic: {
             phrase: mnemonicPhrase,
           },
-          providerOrUrl: "HTTP://192.168.1.145:7545",
+          providerOrUrl: "HTTP://127.0.0.1:7545",
           skipDryRun: true,
           //derivationPath: "m/44'/60'/0'/0/",
         }),
