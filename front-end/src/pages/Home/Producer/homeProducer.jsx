@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 //import { FiPower } from "react-icons/fi";
 import useContract from "../../../hooks/useContract";
@@ -12,10 +12,20 @@ import ProductionTableRow from "../ProductionTableRow";
 import { FiArrowLeft } from "react-icons/fi";
 import HoneyProduction from "./HoneyProduction";
 import Product from "./Product";
-import { useMemo } from "react";
-import Tracing from "../Tracing";
+import ProducerTracing from "./ProducerTracing";
+import NewHoney from "./New/NewHoney";
 
-const HomeProducer = () => {
+function HomeProducer({ userId, userName }) {
+  console.log(userId, userName);
+  const [item, setItem] = useState("");
+
+  const [drumId, setDrumId] = useState("");
+  const [drum, setDrum] = useState({});
+
+  const [palletId, setPalletId] = useState("");
+  const [pallet, setPallet] = useState({});
+
+  const [tracing, setTracing] = useState({});
   const [productions, setProductions] = useState([]);
   const [product, setProduct] = useState([]);
 
@@ -23,76 +33,49 @@ const HomeProducer = () => {
   const [showMel, setShowMel] = useState(false);
 
   const context = useWeb3Context();
-
+  const contract = useContract(abi, Production);
   const history = useHistory("");
 
-  const userId = localStorage.getItem("userId");
-  const userName = localStorage.getItem("userName");
-  const userRole = localStorage.getItem("userRole");
-
-  const contract = useMemo(() => {
-    if (context.active) {
-      return new context.library.eth.Contract(abi, Production);
+  const handleGetDrum = async (drumId) => {
+    try {
+      if (!(context.active & contract))
+        return await contract.methods.getDrum(drumId).call();
+    } catch (error) {
+      alert("Erro na operação.");
     }
-    return null;
-  }, [context.active]);
+  };
 
-  useEffect(() => {
-    (async function fetch() {
-      if (contract) {
-        setProductions(await contract.methods.listProduction().call());
-      }
-    })();
-  }, [contract]);
+  //const handleGetDrumsId = async (userId) => {};
 
-  async function listProduct() {
-    if (contract) {
-      setProduct(await contract.methods.listProduct().call());
-      //setShowMel(true);
+  const handleGetPallet = async (palletId) => {
+    try {
+      if (!(context.active & contract))
+        return await contract.methods.getPallet(palletId).call();
+    } catch (error) {
+      alert("Erro na operação.");
     }
-  }
+  };
 
-  // async function handleShowMel() {
-  //   if (contract) {
-  //     setMel(await contract.methods.listProduct().call());
-  //     setShowMel(true);
-  //   }
+  //const handleGetPalletsId = async (userId) => {};
 
-  //   return (
-  //     <div>
-  //       <p>ola</p>
-  //     </div>
-  //   );
-  //   try {
-  //     // await api.get(`mel/${id}`, {
-  //     //   headers: {
-  //     //     Authorization: produtorId,
-  //     //   },
-  //     // });
-  //     //const response = await contract.methods.listProductBatch(batch).call();
-  //     //setMel(response);
-  //   } catch (err) {
-  //     alert("Falha na operação");
-  //   }
-  // }
-
-  function handleLogout() {
-    localStorage.clear();
-
-    history.push("/");
-  }
+  const handleForwarding = (e) => {
+    e.preventDefault();
+    try {
+      if (!(context.active & contract))
+        contract.methods.forwarding(item).call();
+    } catch (error) {
+      alert("Erro na operação.");
+    }
+  };
 
   return (
     <div className="profile-container">
       <header>
         <span>Bem vindo, {userName}</span>
 
-        <Link className="button" to="/honey/new">
-          Cadastrar
+        <Link className="button" to="/producer/new">
+          Registrar Produção
         </Link>
-        <button onClick={handleLogout} type="button" size={18}>
-          sair
-        </button>
       </header>
 
       <main>
@@ -100,7 +83,7 @@ const HomeProducer = () => {
           {!product.length && (
             <HoneyProduction
               productions={productions}
-              listProduct={listProduct}
+              // listProduct={listProduct}
             />
           )}
           {product.length && (
@@ -109,7 +92,30 @@ const HomeProducer = () => {
         </div>
 
         <div>
-          <Tracing />
+          <form onSubmit={handleGetDrum}>
+            <input
+              type="text"
+              placeholder="ID do produto"
+              value={drumId}
+              onChange={(e) => setDrumId(e.target.value)}
+            />
+            <button type="submit">Search</button>
+          </form>
+        </div>
+        <div>
+          <ProducerTracing context={context} contract={contract} />
+        </div>
+
+        <div>
+          <form onSubmit={handleForwarding}>
+            <input
+              type="text"
+              placeholder="ID do produto"
+              value={item}
+              onChange={(e) => setItem(e.target.value)}
+            />
+            <button type="submit">Enviar</button>
+          </form>
         </div>
         <Link className="button" to="/transaction">
           Transações
@@ -144,9 +150,48 @@ const HomeProducer = () => {
         //     <FiArrowLeft size={16} color="#e02041" />
         //     Voltar
         //   </Link>
-        // </div> */}
+      // </div> */}
     </div>
   );
-};
+}
 
 export default HomeProducer;
+
+// useEffect(() => {
+//   (async function fetch() {
+//     if (contract) {
+//       setProductions(await contract.methods.listProduction().call());
+//     }
+//   })();
+// }, [contract]);
+
+// async function listProduct() {
+//   if (contract) {
+//     setProduct(await contract.methods.listProduct().call());
+//     //setShowMel(true);
+//   }
+// }
+
+// async function handleShowMel() {
+//   if (contract) {
+//     setMel(await contract.methods.listProduct().call());
+//     setShowMel(true);
+//   }
+
+//   return (
+//     <div>
+//       <p>ola</p>
+//     </div>
+//   );
+//   try {
+//     // await api.get(`mel/${id}`, {
+//     //   headers: {
+//     //     Authorization: produtorId,
+//     //   },
+//     // });
+//     //const response = await contract.methods.listProductBatch(batch).call();
+//     //setMel(response);
+//   } catch (err) {
+//     alert("Falha na operação");
+//   }
+// }

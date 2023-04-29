@@ -15,21 +15,21 @@ export default function Login() {
   const history = useHistory("");
 
   const context = useWeb3Context();
-
+  context.setFirstValidConnector(["MetaMask"]);
   const contract = useContract(abi, Authentication);
+
   async function handleLogin(e) {
     e.preventDefault();
 
     try {
       //const response = await api.post("session", { id });
 
-      if (!context.active);
+      if (!(context.active & contract));
       const response = await contract.methods.logon(login, password).call();
-      console.log(response);
-      if (response.id !== "") {
-        localStorage.setItem("userId", response.id);
-        localStorage.setItem("userName", response.name);
-        localStorage.setItem("userRole", response.role);
+      if (response[1]) {
+        localStorage.setItem("userId", response[0].id);
+        localStorage.setItem("userName", response[0].name);
+        localStorage.setItem("userRole", response[0].role);
         history.push("/home");
       } else {
         alert("Usuario ou senha incoretos!");

@@ -11,7 +11,6 @@ import { profileConstants } from "../../constants/profileConstants";
 
 import api from "../../services/api";
 import "./style.css";
-import { useEffect } from "react";
 
 var crypto = require("crypto");
 
@@ -19,7 +18,7 @@ const options = Object.values(profileConstants).map((profile) => ({
   label: profile.charAt(0).toUpperCase() + profile.slice(1),
   value: profile,
 }));
-console.log(options);
+
 export default function Register() {
   const [name, steName] = useState("Samuel Brandao");
   const [certification, setCertification] = useState("123");
@@ -35,12 +34,7 @@ export default function Register() {
   const context = useWeb3Context();
 
   context.setFirstValidConnector(["MetaMask"]);
-  const contract = useMemo(() => {
-    if (context.active) {
-      return new context.library.eth.Contract(abi, Authentication);
-    }
-    return null;
-  }, [context.active]);
+  const contract = useContract(abi, Authentication);
 
   async function generateId() {
     console.log("aqui");
@@ -67,6 +61,7 @@ export default function Register() {
     const id = await generateId();
     try {
       //const response = await api.post("apicultor", data);
+      if (!(context.active & contract));
       const response = await contract.methods
         .register(
           [
@@ -89,7 +84,7 @@ export default function Register() {
         alert("Usuário cadastrado!");
       }
 
-      //history.push("/");
+      history.push("/");
     } catch (err) {
       console.log(err);
       alert("Erro no cadastro, tente novamente.");

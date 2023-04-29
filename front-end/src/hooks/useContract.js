@@ -1,11 +1,7 @@
 import { useWeb3Context } from "web3-react";
-import { useEffect, useMemo } from "react";
-//import Web3 from "web3";
-
-//import { contractAddress } from "../abi/address.json";
+import { useMemo } from "react";
 
 const useContract = (abi, address) => {
-  const context = useWeb3Context();
   //const getConnection = async () => await context.setConnector("MetaMask");
   // context.setConnector("MetaMask");
 
@@ -16,11 +12,7 @@ const useContract = (abi, address) => {
   //   }
   // };
   // return { getContract, context };
-
-  useEffect(() => {
-    context.setFirstValidConnector(["MetaMask"]);
-  }, [context.active]);
-
+  const context = useWeb3Context();
   const contract = useMemo(() => {
     if (context.active) {
       return new context.library.eth.Contract(abi, address);

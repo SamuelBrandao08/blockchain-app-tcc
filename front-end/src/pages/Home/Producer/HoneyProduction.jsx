@@ -5,7 +5,6 @@ import ProductionTableRow from "../ProductionTableRow";
 // import { Container } from './styles';
 
 function HoneyProduction({ productions, listProduct }) {
-  console.log(listProduct);
   function generateTable() {
     if (!productions) return;
     return productions.map((production, i) => {

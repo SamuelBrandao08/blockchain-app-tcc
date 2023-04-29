@@ -18,7 +18,7 @@ function MelTableRow(props) {
       <td>{producaoId}</td>
 
       <td>
-        <button onClick={() => TrVerify()} className="btn btn-danger">
+        <button onClick={() => TrVerify} className="btn btn-danger">
           Verificar Transação
         </button>
       </td>

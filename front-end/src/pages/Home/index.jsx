@@ -21,104 +21,87 @@ export default function Home() {
   const [mel, setMel] = useState([]);
   const [productions, setProductions] = useState([]);
   const [batch, setBatch] = useState();
-
   const [showMel, setShowMel] = useState(false);
 
   const context = useWeb3Context();
-  const contract = useContract(abi, Production);
-  console.log(context);
   const history = useHistory("");
 
   const userId = localStorage.getItem("userId");
   const userName = localStorage.getItem("userName");
   const userRole = localStorage.getItem("userRole");
-  console.log(userRole);
 
-  useEffect(() => {
-    (async function fetch() {
-      if (contract) {
-        //setProductions(await contract.methods.listProduction().call());
-      }
-    })();
-  }, [contract]);
-  console.log("producao ", productions);
+  // useEffect(() => {
+  //   (async function fetch() {
+  //     if (contract) {
+  //       //setProductions(await contract.methods.listProduction().call());
+  //     }
+  //   })();
+  // }, [contract]);
+  // console.log("producao ", productions);
 
-  async function handleShowMel() {
-    // try {
-    //   // await api.get(`mel/${id}`, {
-    //   //   headers: {
-    //   //     Authorization: produtorId,
-    //   //   },
-    //   // });
-    //   //const response = await contract.methods.listProductBatch(batch).call();
-    //   //setMel(response);
-    // } catch (err) {
-    //   alert("Falha na operação");
-    // }
+  // async function handleShowMel() {
+  //   // try {
+  //   //   // await api.get(`mel/${id}`, {
+  //   //   //   headers: {
+  //   //   //     Authorization: produtorId,
+  //   //   //   },
+  //   //   // });
+  //   //   //const response = await contract.methods.listProductBatch(batch).call();
+  //   //   //setMel(response);
+  //   // } catch (err) {
+  //   //   alert("Falha na operação");
+  //   // }
 
-    if (contract) {
-      setMel(await contract.methods.listProduct().call());
-      setShowMel(true);
-    }
-
-    console.log("funcao handleShowMel");
-
-    // return (
-    //   <main>
-    //     {console.log("aqui")}
-    //     <h3>Produto Beneficiado</h3>
-    //     <table className="table table-striped">
-    //       <thead>
-    //         <tr>
-    //           <th>ID</th>
-    //           <th>Peso Total</th>
-    //           <th>Data de coleta</th>
-    //           <th>Localização</th>
-    //           <th>Apicultor</th>
-    //           <th>Colmeias</th>
-    //           <th colSpan={2} style={{ textAlign: "center" }}></th>
-    //         </tr>
-    //       </thead>
-    //       <tbody>{generateTable2()}</tbody>
-    //       {console.log("genarateTable2")}
-    //     </table>
-    //   </main>
-    // );
-  }
-  console.log("mel ", mel);
+  //   if (contract) {
+  //     setMel(await contract.methods.listProduct().call());
+  //     setShowMel(true);
+  //   }
+  // }
 
   function handleLogout() {
     localStorage.clear();
-
+    context.unsetConnector();
     history.push("/");
   }
 
-  function generateTable() {
-    if (!productions) return;
-    return productions.map((production, i) => {
-      return (
-        <ProductionTableRow
-          production={production}
-          key={i}
-          handleShowMel={handleShowMel}
-        />
-      );
-    });
-  }
+  // function generateTable() {
+  //   if (!productions) return;
+  //   return productions.map((production, i) => {
+  //     return (
+  //       <ProductionTableRow
+  //         production={production}
+  //         key={i}
+  //         handleShowMel={handleShowMel}
+  //       />
+  //     );
+  //   });
+  // }
 
-  function generateTable2() {
-    if (!mel) return;
-    return mel.map((mel, i) => {
-      return <MelTableRow mel={mel} key={i} handleShowMel={handleShowMel} />;
-    });
-  }
+  // function generateTable2() {
+  //   if (!mel) return;
+  //   return mel.map((mel, i) => {
+  //     return <MelTableRow mel={mel} key={i} handleShowMel={handleShowMel} />;
+  //   });
+  // }
 
   return (
     <div>
-      {userRole === profileConstants.PRODUCER && <HomeProducer />}
-      {userRole === profileConstants.PROCESSOR && <HomeProcessor />}
-      {userRole === profileConstants.DISTRIBUTOR && <HomeDistributor />}
-      {userRole === profileConstants.MERCHANT && <HomeMerchant />}
+      <div className="profile-container">
+        <header>
+          <span>Bem vindo, {userName}</span>
+          <button onClick={handleLogout} type="button" size={18}>
+            sair
+          </button>
+        </header>
+      </div>
+      <div>
+        {userRole === profileConstants.PRODUCER && (
+          <HomeProducer userId={userId} userName={userName} />
+        )}
+        {userRole === profileConstants.PROCESSOR && <HomeProcessor />}
+        {userRole === profileConstants.DISTRIBUTOR && <HomeDistributor />}
+        {userRole === profileConstants.MERCHANT && <HomeMerchant />}
+      </div>
     </div>
     // <div className="profile-container">
     //   <header>
