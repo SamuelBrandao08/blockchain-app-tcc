@@ -6,6 +6,7 @@ import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import useContract from "../../../../hooks/useContract";
 import { abi } from "../../../../abi/Production.json";
 import { Production } from "../../../../abi/address.json";
+import { useAuth } from "../../../../contexts/AuthContext";
 
 var crypto = require("crypto");
 
@@ -23,7 +24,7 @@ var crypto = require("crypto");
 //     uint256[] hivesId;
 // }
 function NewHoney() {
-  const userId = localStorage.getItem("userId");
+  const {user} = useAuth()
   const history = useHistory();
   const context = useWeb3Context();
   const contract = useContract(abi, Production, context);
@@ -41,7 +42,7 @@ function NewHoney() {
   const generateBatch = async () => {
     try {
       if (!(context.active & contract));
-      //return await contract.methods.generateBatch(userId, flowering, date).call();
+      //return await contract.methods.generateBatch(user.id, flowering, date).call();
       return crypto.randomBytes(4).toString("HEX");
     } catch (error) {
       alert("Erro na operação.");
@@ -56,7 +57,7 @@ function NewHoney() {
       if (!(context.active & contract));
       const response = await contract.methods
         .newTun(
-          userId,
+          user.id,
           _batch,
           apiary,
           weight,
@@ -80,7 +81,7 @@ function NewHoney() {
     try {
       if (!(context.active & contract));
       const response = await contract.methods
-        .newPallet(userId, batch, drumsId)
+        .newPallet(user.id, batch, drumsId)
         .send({
           from: context.account,
         });

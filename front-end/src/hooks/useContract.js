@@ -13,6 +13,9 @@ const useContract = (abi, address) => {
   // };
   // return { getContract, context };
   const context = useWeb3Context();
+  if(!context.active){
+    context.setFirstValidConnector(["MetaMask"])
+  }
   const contract = useMemo(() => {
     if (context.active) {
       return new context.library.eth.Contract(abi, address);

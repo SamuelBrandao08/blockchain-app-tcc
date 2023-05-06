@@ -12,8 +12,10 @@ import useContract from "../../hooks/useContract";
 import { abi } from "../../abi/Production.json";
 import { Production } from "../../abi/address.json";
 import { useWeb3Context } from "web3-react";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function NewHoney() {
+  const {user} = useAuth()
   const history = useHistory();
 
   const [codigo, setCodigo] = useState(0);
@@ -29,8 +31,7 @@ export default function NewHoney() {
   const context = useWeb3Context();
   const contract = useContract(abi, Production);
 
-  const userId = localStorage.getItem("userId");
-  console.log("user ", userId);
+  console.log("user ", user.id);
   //const producao_id = history.location.state;
 
   async function handleNewHoney(e) {
@@ -51,7 +52,7 @@ export default function NewHoney() {
       // alert("Produto registrado!");
 
       console.log(contract);
-      await contract.methods.registerProduct2(data, userId).send({
+      await contract.methods.registerProduct2(data, user.id).send({
         from: context.account,
       });
 
@@ -71,7 +72,7 @@ export default function NewHoney() {
 
       console.log(typeof colmeiasId);
       contract.methods
-        .registerProduction(producao_id, peso, localizacao, userId, [
+        .registerProduction(producao_id, peso, localizacao, user.id, [
           colmeiasId,
         ])
         .send({
@@ -92,7 +93,7 @@ export default function NewHoney() {
   //const [date, setDate] = useState(0);
   const [unidades, setUnidades] = useState(0);
 
-  console.log("user ", typeof userId);
+  console.log("user ", typeof user.id);
 
   async function handleNewBatch(e) {
     e.preventDefault();
@@ -119,7 +120,7 @@ export default function NewHoney() {
         count++;
       }
 
-      await contract.methods.registerProductList(state, userId).send({
+      await contract.methods.registerProductList(state, user.id).send({
         from: context.account,
       });
 

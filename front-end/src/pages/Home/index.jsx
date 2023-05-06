@@ -16,8 +16,10 @@ import HomeProducer from "./Producer/homeProducer";
 import HomeDistributor from "./Distributor/homeDistributor";
 import HomeProcessor from "./Processor/homeProcessor";
 import HomeMerchant from "./Merchant/homeMerchant";
+import { useAuth } from "../../contexts/AuthContext";
 
 export default function Home() {
+  const {user} = useAuth()
   const [mel, setMel] = useState([]);
   const [productions, setProductions] = useState([]);
   const [batch, setBatch] = useState();
@@ -25,10 +27,6 @@ export default function Home() {
 
   const context = useWeb3Context();
   const history = useHistory("");
-
-  const userId = localStorage.getItem("userId");
-  const userName = localStorage.getItem("userName");
-  const userRole = localStorage.getItem("userRole");
 
   // useEffect(() => {
   //   (async function fetch() {
@@ -83,29 +81,28 @@ export default function Home() {
   //     return <MelTableRow mel={mel} key={i} handleShowMel={handleShowMel} />;
   //   });
   // }
-
   return (
     <div>
       <div className="profile-container">
         <header>
-          <span>Bem vindo, {userName}</span>
+          <span>Bem vindo, {user.name}</span>
           <button onClick={handleLogout} type="button" size={18}>
             sair
           </button>
         </header>
       </div>
       <div>
-        {userRole === profileConstants.PRODUCER && (
-          <HomeProducer userId={userId} userName={userName} />
+        {user.role === profileConstants.PRODUCER && (
+          <HomeProducer userId={user.id} userName={user.name} />
         )}
-        {userRole === profileConstants.PROCESSOR && <HomeProcessor />}
-        {userRole === profileConstants.DISTRIBUTOR && <HomeDistributor />}
-        {userRole === profileConstants.MERCHANT && <HomeMerchant />}
+        {user.role === profileConstants.PROCESSOR && <HomeProcessor />}
+        {user.role === profileConstants.DISTRIBUTOR && <HomeDistributor />}
+        {user.role === profileConstants.MERCHANT && <HomeMerchant />}
       </div>
     </div>
     // <div className="profile-container">
     //   <header>
-    //     <span>Bem vindo, {userName}</span>
+    //     <span>Bem vindo, {user.name}</span>
 
     //     <Link className="button" to="/honey/new">
     //       Cadastrar

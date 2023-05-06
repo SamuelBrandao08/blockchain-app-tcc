@@ -44,7 +44,7 @@ form input {
     text-decoration: none;
     font-size: 18px;
     line-height: 60px;
-
+    cursor: pointer;
 }
 
 .button:hover {
