@@ -1,68 +1,89 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 //import { FiPower } from "react-icons/fi";
 import useContract from "../../../hooks/useContract";
-import { abi } from "../../../abi/Production.json";
+import PRC from "../../../abi/Production.json";
 import { Production } from "../../../abi/address.json";
 
 import "./style.css";
 import api from "../../../services/api";
 import { useWeb3Context } from "web3-react";
-import ProductionTableRow from "../ProductionTableRow";
 import { FiArrowLeft } from "react-icons/fi";
-import HoneyProduction from "./HoneyProduction";
-import Product from "./Product";
-import ProducerTracing from "./ProducerTracing";
-import NewHoney from "./New/NewHoney";
+import HoneyProduction from "./Componentes/Production/HoneyProduction";
+import DispatchedProducts from "./Componentes/Dispatched/DispatchedProducts";
+import ProducerTracing from "./Componentes/ProducerTracing";
+import useWallet from "../../../hooks/useConnect";
 
 function HomeProducer({ userId, userName }) {
-  console.log(userId, userName);
+  //console.log(userName, userId);
   const [item, setItem] = useState("");
 
   const [drumId, setDrumId] = useState("");
   const [drum, setDrum] = useState({});
+  const [drums, setDrums] = useState([]);
 
-  const [palletId, setPalletId] = useState("");
+  const [palletId, setPalletId] = useState([]);
   const [pallet, setPallet] = useState({});
 
-  const [tracing, setTracing] = useState({});
-  const [productions, setProductions] = useState([]);
+  const [dispatcheds, setDispatcheds] = useState([]);
   const [product, setProduct] = useState([]);
 
-  const [mel, setMel] = useState([]);
-  const [showMel, setShowMel] = useState(false);
+  const [batchs, setBatchs] = useState([]);
+  const [selectedBatch, setSelectedBatch] = useState("");
 
   const context = useWeb3Context();
-  const contract = useContract(abi, Production);
-  const history = useHistory("");
+  const contract = useContract(PRC.abi, Production);
+
+  useEffect(() => {
+    getBatchs();
+    listDispatched();
+  }, [contract]);
+
+  useEffect(() => {
+    if (batchs.length === 0) return;
+    listDrums();
+  }, [selectedBatch]);
+
+  console.log("lote", selectedBatch);
+  const getBatchs = async () => {
+    if (contract !== null) {
+      const response = await contract.methods.getDrumBatchs(userId).call();
+      const options = response.map((i) => ({
+        label: i,
+        value: i,
+      }));
+      setBatchs(options.reverse());
+      setSelectedBatch(options[0].value);
+    }
+  };
+
+  const listDrums = async () => {
+    if (contract !== null) {
+      const response = await contract.methods.listDrums(selectedBatch).call();
+      setDrums(response);
+    }
+  };
+
+  const listDispatched = async () => {
+    if (contract !== null) {
+      const response = await contract.methods.listDispatched(userId).call();
+      setDispatcheds(response);
+    }
+  };
 
   const handleGetDrum = async (drumId) => {
     try {
-      if (!(context.active & contract))
-        return await contract.methods.getDrum(drumId).call();
+      if (contract === null) return;
+      return await contract.methods.getDrum(drumId).call();
     } catch (error) {
       alert("Erro na operação.");
     }
   };
-
-  //const handleGetDrumsId = async (userId) => {};
 
   const handleGetPallet = async (palletId) => {
     try {
-      if (!(context.active & contract))
-        return await contract.methods.getPallet(palletId).call();
-    } catch (error) {
-      alert("Erro na operação.");
-    }
-  };
-
-  //const handleGetPalletsId = async (userId) => {};
-
-  const handleForwarding = (e) => {
-    e.preventDefault();
-    try {
-      if (!(context.active & contract))
-        contract.methods.forwarding(item).call();
+      if (contract === null);
+      return await contract.methods.getPallet(palletId).call();
     } catch (error) {
       alert("Erro na operação.");
     }
@@ -70,28 +91,28 @@ function HomeProducer({ userId, userName }) {
 
   return (
     <div className="profile-container">
-      <header>
-        <span>Bem vindo, {userName}</span>
-
-        <Link className="button" to="/producer/new">
+      <div className="container-register">
+        <Link className="button" to="/producer/new/drum">
           Registrar Produção
         </Link>
-      </header>
-
-      <main>
+      </div>
+      <div>
         <div>
-          {!product.length && (
-            <HoneyProduction
-              productions={productions}
-              // listProduct={listProduct}
-            />
-          )}
-          {product.length && (
+          <HoneyProduction
+            drums={drums}
+            selectedBatch={selectedBatch}
+            setSelectedBatch={setSelectedBatch}
+            batchs={batchs}
+            setBatchs={setBatchs}
+            contract={contract}
+            // listProduct={listProduct}
+          />
+
+          {/* {product.length && (
             <Product product={product} handleBack={() => setProduct([])} />
-          )}
+          )} */}
         </div>
-
-        <div>
+        {/* <div>
           <form onSubmit={handleGetDrum}>
             <input
               type="text"
@@ -101,97 +122,23 @@ function HomeProducer({ userId, userName }) {
             />
             <button type="submit">Search</button>
           </form>
-        </div>
-        <div>
-          <ProducerTracing context={context} contract={contract} />
-        </div>
+        </div> */}
 
-        <div>
-          <form onSubmit={handleForwarding}>
-            <input
-              type="text"
-              placeholder="ID do produto"
-              value={item}
-              onChange={(e) => setItem(e.target.value)}
-            />
-            <button type="submit">Enviar</button>
-          </form>
-        </div>
-        <Link className="button" to="/transaction">
-          Transações
+        <Link className="button" to="/producer/transaction">
+          Despachar Produção
         </Link>
-      </main>
-
-      {/* // <div>
-        //   <main>
-        //     {console.log("aqui")}
-        //     <h3>Produto Beneficiado</h3>
-        //     <table className="table table-striped">
-        //       <thead>
-        //         <tr>
-        //           <th>ID</th>
-        //           <th>Peso Total</th>
-        //           <th>Data de coleta</th>
-        //           <th>Localização</th>
-        //           <th>Apicultor</th>
-        //           <th>Colmeias</th>
-        //           <th colSpan={2} style={{ textAlign: "center" }}></th>
-        //         </tr>
-        //       </thead>
-        //       <tbody>{generateTable2()}</tbody>
-        //       {console.log("genarateTable2")}
-        //     </table>
-        //   </main>
-        //   <Link
-        //     className="back-link"
-        //     to={"/profile"}
-        //     onClick={() => setShowMel(false)}
-        //   >
-        //     <FiArrowLeft size={16} color="#e02041" />
-        //     Voltar
-        //   </Link>
-      // </div> */}
+      </div>
+      <div>
+        <DispatchedProducts
+          dispatcheds={dispatcheds}
+          setDispatcheds={setDispatcheds}
+        />
+      </div>
+      <div>
+        <ProducerTracing />
+      </div>
     </div>
   );
 }
 
 export default HomeProducer;
-
-// useEffect(() => {
-//   (async function fetch() {
-//     if (contract) {
-//       setProductions(await contract.methods.listProduction().call());
-//     }
-//   })();
-// }, [contract]);
-
-// async function listProduct() {
-//   if (contract) {
-//     setProduct(await contract.methods.listProduct().call());
-//     //setShowMel(true);
-//   }
-// }
-
-// async function handleShowMel() {
-//   if (contract) {
-//     setMel(await contract.methods.listProduct().call());
-//     setShowMel(true);
-//   }
-
-//   return (
-//     <div>
-//       <p>ola</p>
-//     </div>
-//   );
-//   try {
-//     // await api.get(`mel/${id}`, {
-//     //   headers: {
-//     //     Authorization: produtorId,
-//     //   },
-//     // });
-//     //const response = await contract.methods.listProductBatch(batch).call();
-//     //setMel(response);
-//   } catch (err) {
-//     alert("Falha na operação");
-//   }
-// }

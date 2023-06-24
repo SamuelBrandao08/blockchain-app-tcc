@@ -6,9 +6,10 @@ import "./UpdateTr.sol";
 
 struct ReceivedUnit {
     string id;
+    string[] units;
     string distributorId;
     string date;
-    string local;
+    UnitType unitType;
 }
 
 struct ReceivedContainer {
@@ -16,15 +17,12 @@ struct ReceivedContainer {
     string[] units;
     string distributorId;
     string date;
-    string local;
 } // Logistc Unit Received
 
 contract Merchant {
     mapping(string => ReceivedUnit) receivedUnits; // Lista de containers recebidos para entrega por cada distribuidor.
-    mapping(string => string[]) receivedUnitsId;
-
     mapping(string => ReceivedContainer) receivedContainers; // Lista de containers recebidos para entrega por cada distribuidor.
-    mapping(string => string[]) receivedContainersId;
+    mapping(string => string[]) receivedUnitsId; // user id => unit id[] Lista dos ids das unidades recebidas por comerciante
 
     address contractAuthentication;
     Authentication instanceAuthentication;
@@ -49,16 +47,18 @@ contract Merchant {
 
     function registerReceivedUnit(
         string memory _id,
+        string[] memory _units,
         string memory _distributorId,
         string memory _dateTime,
-        string memory _local,
+        UnitType _unitType,
         string memory _userId
-    ) public onlyOWNER(_userId) {
+    ) private {
         receivedUnits[_id] = ReceivedUnit(
             _id,
+            _units,
             _distributorId,
             _dateTime,
-            _local
+            _unitType
         );
         receivedUnitsId[_userId].push(_id);
     }
@@ -80,17 +80,15 @@ contract Merchant {
         string[] memory _units,
         string memory _distributorId,
         string memory _date,
-        string memory _local,
         string memory _userId
-    ) public onlyOWNER(_userId) {
+    ) private {
         receivedContainers[_id] = ReceivedContainer(
             _id,
             _units,
             _distributorId,
-            _date,
-            _local
+            _date
         );
-        receivedContainersId[_userId].push(_id);
+        receivedUnitsId[_userId].push(_id);
     }
 
     function getReceivedContainer(
@@ -99,29 +97,34 @@ contract Merchant {
         return receivedContainers[_id];
     }
 
-    function getReceivedContainerId(
-        string memory _userId
-    ) public view returns (string[] memory) {
-        return receivedContainersId[_userId];
+    function listReceivedUnits(
+        string memory _user
+    ) public view returns (ReceivedUnit[] memory) {
+        ReceivedUnit[] memory unitsArray = new ReceivedUnit[](
+            receivedUnitsId[_user].length
+        );
+        for (uint256 i = 0; i < unitsArray.length; i++) {
+            unitsArray[i] = receivedUnits[receivedUnitsId[_user][i]];
+        }
+        return unitsArray;
     }
 
-    //Função para registrar a tranzação de um produto
-    function forwarding(
+    function receiver(
         string memory _sender,
         string memory _receiver,
-        string memory _unitId,
+        string memory _unit,
+        string[] memory _units,
         string memory _date,
-        string memory _businessUnitType,
-        bytes memory _signature
-    ) public onlyOWNER(_receiver) {
-        //chamar funcao updateTr no contrato UpdateTr
-        instanceUpdateTr.updateTr(
+        UnitType _unitType
+    ) public onlyOWNER(_receiver) returns (bool) {
+        registerReceivedUnit(
+            _unit,
+            _units,
             _sender,
-            _receiver,
-            _unitId,
             _date,
-            _businessUnitType,
-            _signature
+            _unitType,
+            _receiver
         );
+        return true;
     }
 }

@@ -18,7 +18,7 @@ module.exports = {
           mnemonic: {
             phrase: mnemonicPhrase,
           },
-          providerOrUrl: "HTTP://127.0.0.1:7545",
+          providerOrUrl: "HTTP://192.168.1.100:7545",
           skipDryRun: true,
           //derivationPath: "m/44'/60'/0'/0/",
         }),
@@ -32,11 +32,11 @@ module.exports = {
           mnemonic: {
             phrase: mnemonicPhrase,
           },
-          providerOrUrl: "http://192.168.1.139:7545",
+          providerOrUrl: "http://3.210.145.39:8545",
           skipDryRun: true,
           //derivationPath: "m/44'/60'/0'/0/",
         }),
-      network_id: "1500",
+      network_id: "5045",
     },
   },
   compilers: {

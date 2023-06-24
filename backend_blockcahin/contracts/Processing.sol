@@ -5,20 +5,23 @@ import "./UpdateTr.sol";
 
 struct Feedstock {
     string id;
-    string distributorId;
-    string dateTime;
-}
-
-struct FeedstockContainer {
-    string id;
     string[] feedstockIds;
     string distributorId;
     string dateTime;
+    UnitType unitType;
 }
+
+// struct FeedstockContainer {
+//     string id;
+//     string[] feedstockIds;
+//     string distributorId;
+//     string dateTime;
+// }
 
 struct Honey {
     string id;
     string batch;
+    string code;
     string feedstockBatch;
     string honeyType;
     string variety;
@@ -30,34 +33,45 @@ struct Honey {
 
 struct Box {
     string id;
-    string batch;
+    string code;
     string[] honeyId;
 }
 
 struct Pallet {
     string id;
+    string code;
     string[] boxId;
+}
+
+struct Dispatched {
+    string transporter;
+    string unit;
+    string date;
 }
 
 contract Processing {
     // Variaveis de estado
+    uint serialNumber;
     mapping(string => Feedstock) feedstocks; // endereco => (codigo => carregamento). lista de materia prima recebida por cada processador de mel.
     mapping(string => string[]) feedstocksId;
 
-    mapping(string => FeedstockContainer) feedstockContainers; // endereco => (codigo => carregamento). lista de materia prima recebida por cada processador de mel.
-    mapping(string => string[]) feedstockContainersId;
-
     mapping(string => Honey) honeys; // honey id => Honey. Lista de produtos fabricados por cada processador de mel.
     mapping(string => string[]) honeysId; // user id => honey id []
-    mapping(string => string[]) honeysBatch; // user id => batch[]
+    mapping(string => string[]) honeyBatchs; // user id => batch[]
     mapping(string => uint32) count; // batch => counter
 
     mapping(string => Box) boxes; // endereco => (codigo => Container). Lista de conteiners(caixa ou palete) montados por cada processador de mel.
     mapping(string => string[]) boxesId;
 
-    mapping(string => Pallet) pallets; // endereco => (codigo => Container). Lista de conteiners(caixa ou palete) montados por cada processador de mel.
+    mapping(string => Pallet) pallets; // id pallet => pallet. Lista de conteiners(caixa ou palete) montados por cada processador de mel.
     mapping(string => string[]) palletsId;
     //mapping(string => string[]) palletsBatch;
+
+    mapping(string => Dispatched) dispatcheds; // item id => Dispatche
+    mapping(string => string[]) dispatchedsId; // user id => item id
+
+    event NewUnit(string user, string unit);
+    event NewUnits(string user, string[] units);
 
     address contractAuthentication;
     Authentication instanceAuthentication;
@@ -69,6 +83,7 @@ contract Processing {
         instanceAuthentication = Authentication(contractAuthentication);
         contractUpdateTr = _contractUpdateTr;
         instanceUpdateTr = UpdateTr(contractUpdateTr);
+        serialNumber = 1;
     }
 
     //Verifica se o endereço que esta chamando o contrato possui permisao para modificar o estado da rede
@@ -81,13 +96,21 @@ contract Processing {
     }
 
     // Funções relacionadas ao mel recebido pelos processadores
-    function regiterFeedstock(
+    function receiver(
         string memory _id,
+        string[] memory _feedstockIds,
         string memory _distributorId,
         string memory _date,
+        UnitType _unitType,
         string memory _userId
     ) public onlyOWNER(_userId) {
-        feedstocks[_id] = Feedstock(_id, _distributorId, _date);
+        feedstocks[_id] = Feedstock(
+            _id,
+            _feedstockIds,
+            _distributorId,
+            _date,
+            _unitType
+        );
         feedstocksId[_userId].push(_id);
     }
 
@@ -104,33 +127,16 @@ contract Processing {
         return feedstocksId[_userId];
     }
 
-    function regiterFeedstockContainer(
-        string memory _id,
-        string[] memory _feedstockIds,
-        string memory _distributorId,
-        string memory _date,
+    function listFeedstock(
         string memory _userId
-    ) public onlyOWNER(_userId) {
-        feedstockContainers[_id] = FeedstockContainer(
-            _id,
-            _feedstockIds,
-            _distributorId,
-            _date
+    ) public view returns (Feedstock[] memory) {
+        Feedstock[] memory feedstock = new Feedstock[](
+            feedstocksId[_userId].length
         );
-        feedstockContainersId[_userId].push(_id);
-    }
-
-    // Funcoes GET
-    function getFeedstockContainer(
-        string memory _id
-    ) public view returns (FeedstockContainer memory) {
-        return feedstockContainers[_id];
-    }
-
-    function getFeedstockContainerId(
-        string memory _userId
-    ) public view returns (string[] memory) {
-        return feedstockContainersId[_userId];
+        for (uint256 i = 0; i < feedstock.length; i++) {
+            feedstock[i] = feedstocks[feedstocksId[_userId][i]];
+        }
+        return feedstock;
     }
 
     // Funções relacionadas ao mel beneficiado produzido pelos processadores
@@ -138,38 +144,37 @@ contract Processing {
     function generateBatch(
         string memory _userId,
         string memory _feedstockBatch,
-        string memory _honeyType,
-        string memory _variety,
-        uint64 _weight,
-        string memory _dateTime
+        string memory _variety
     ) public returns (string memory) {
-        bytes4 _hash = bytes4(
+        uint hashDigits = 8;
+        uint hashModulus = 10 ** hashDigits;
+        uint _hash = uint(
             keccak256(
                 abi.encodePacked(
                     _userId,
                     _feedstockBatch,
-                    _honeyType,
                     _variety,
-                    _weight,
-                    _dateTime
+                    block.timestamp
                 )
             )
         );
-        string memory _batch = string(abi.encodePacked(_userId, _hash));
-        honeysBatch[_userId].push(_batch);
+        string memory _batch = uintToString(_hash % hashModulus);
+        honeyBatchs[_userId].push(_batch);
         return _batch;
     }
 
     function newHoney(
         Honey memory _honey,
         string memory _userId
-    ) public onlyOWNER(_userId) returns (string memory) {
-        uint32 _count = count[_honey.batch]++;
-        string memory _id = string(abi.encodePacked(_honey.batch, _count));
-        //string memory _id = string(abi.encodePacked(_batch, _dateTime));
+    ) public onlyOWNER(_userId) {
+        string memory _id = string(
+            abi.encodePacked(_honey.batch, uintToString(serialNumber))
+        );
+        require(bytes(honeys[_id].id).length == 0);
         honeys[_id] = Honey(
             _id,
             _honey.batch,
+            _honey.code,
             _honey.feedstockBatch,
             _honey.honeyType,
             _honey.variety,
@@ -179,42 +184,8 @@ contract Processing {
             _honey.composition
         );
         honeysId[_userId].push(_id);
-        return _id;
-    }
-
-    function newHoneys(
-        Honey memory _honey,
-        string memory _dateTime,
-        uint _amount,
-        string memory _userId
-    ) public onlyOWNER(_userId) returns (string[] memory id) {
-        string memory _batch = generateBatch(
-            _userId,
-            _honey.feedstockBatch,
-            _honey.honeyType,
-            _honey.variety,
-            _honey.weight,
-            _dateTime
-        );
-
-        for (uint256 index = 0; index < _amount; index++) {
-            uint32 _count = count[_batch]++;
-            string memory _id = string(abi.encodePacked(_batch, _count));
-            honeys[_id] = Honey(
-                _id,
-                _batch,
-                _honey.feedstockBatch,
-                _honey.honeyType,
-                _honey.variety,
-                _honey.weight,
-                _honey.packaging,
-                _honey.validity,
-                _honey.composition
-            );
-            honeysId[_userId].push(_id);
-            id[index] = _id;
-        }
-        return id;
+        serialNumber++;
+        emit NewUnit(_userId, _id);
     }
 
     function getHoney(string memory _id) public view returns (Honey memory) {
@@ -227,19 +198,35 @@ contract Processing {
         return honeysId[_userId];
     }
 
+    function getHoneyBatchs(
+        string memory _userId
+    ) public view returns (string[] memory) {
+        return honeyBatchs[_userId];
+    }
+
+    function listHoneys(
+        string memory _userId
+    ) public view returns (Honey[] memory) {
+        Honey[] memory honey = new Honey[](honeysId[_userId].length);
+        for (uint256 i = 0; i < honey.length; i++) {
+            honey[i] = honeys[honeysId[_userId][i]];
+        }
+        return honey;
+    }
+
     // Funções relacionadas aos containeres de mel produzidos pelos processadores
     function newBox(
         string[] memory _honeyId,
         string memory _userId,
-        string memory _batch,
-        string memory _dateTime
-    ) public onlyOWNER(_userId) returns (string memory) {
-        //bytes32 _id = bytes32(keccak256(abi.encodePacked(_honeyId)));
-
-        string memory _id = string(abi.encodePacked(_batch, _dateTime));
-        boxes[_id] = Box(_id, _batch, _honeyId);
+        string memory _code
+    ) public onlyOWNER(_userId) {
+        string memory _id = string(
+            abi.encodePacked(_code, uintToString(serialNumber))
+        );
+        require(bytes(boxes[_id].id).length == 0);
+        boxes[_id] = Box(_id, _code, _honeyId);
         boxesId[_userId].push(_id);
-        return _id;
+        emit NewUnit(_userId, _id);
     }
 
     function getBox(string memory _id) public view returns (Box memory) {
@@ -254,14 +241,16 @@ contract Processing {
 
     function newPallet(
         string[] memory _boxId,
+        string memory _code,
         string memory _userId
-    ) public onlyOWNER(_userId) returns (string memory) {
-        //string memory _id = string(abi.encodePacked(keccak256(abi.encode(_boxId))));
-        bytes16 _hash = bytes16(keccak256(abi.encode(_boxId)));
-        string memory _id = string(abi.encodePacked(_userId, _hash));
-        pallets[_id] = Pallet(_id, _boxId);
+    ) public onlyOWNER(_userId) {
+        string memory _id = string(
+            abi.encodePacked(_code, uintToString(serialNumber))
+        );
+        require(bytes(boxes[_id].id).length == 0);
+        pallets[_id] = Pallet(_id, _code, _boxId);
         palletsId[_userId].push(_id);
-        return _id;
+        emit NewUnit(_userId, _id);
     }
 
     // Fonções GET
@@ -275,23 +264,49 @@ contract Processing {
         return palletsId[_userId];
     }
 
-    //Função para registrar a tranzação de um produto
-    function forwarding(
+    function getDispatched(
+        string memory _id
+    ) public view returns (Dispatched memory) {
+        return dispatcheds[_id];
+    }
+
+    function listDispatched(
+        string memory _userId
+    ) public view returns (Dispatched[] memory) {
+        Dispatched[] memory dispatched = new Dispatched[](
+            dispatchedsId[_userId].length
+        );
+        for (uint256 i = 0; i < dispatched.length; i++) {
+            dispatched[i] = dispatcheds[dispatchedsId[_userId][i]];
+        }
+        return dispatched;
+    }
+
+    function dispatcher(
         string memory _sender,
         string memory _receiver,
-        string memory _unitId,
-        string memory _date,
-        string memory _businessUnitType,
-        bytes memory _signature
-    ) public onlyOWNER(_receiver) {
-        //chamar funcao updateTr no contrato UpdateTr
-        instanceUpdateTr.updateTr(
-            _sender,
-            _receiver,
-            _unitId,
-            _date,
-            _businessUnitType,
-            _signature
-        );
+        string memory _unit,
+        string memory _date
+    ) public onlyOWNER(_sender) returns (bool) {
+        dispatcheds[_unit] = Dispatched(_receiver, _unit, _date);
+        dispatchedsId[_sender].push(_unit);
+
+        return true;
+    }
+
+    function uintToString(uint v) internal pure returns (string memory str) {
+        uint maxlength = 100;
+        bytes memory reversed = new bytes(maxlength);
+        uint i = 0;
+        while (v != 0) {
+            uint remainder = v % 10;
+            v = v / 10;
+            reversed[i++] = bytes1(uint8(48 + remainder));
+        }
+        bytes memory s = new bytes(i);
+        for (uint j = 0; j < i; j++) {
+            s[j] = reversed[i - 1 - j];
+        }
+        return str = string(s);
     }
 }

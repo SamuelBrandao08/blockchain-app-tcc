@@ -10,7 +10,7 @@ const updateAddress = require("./utils/file");
 module.exports = async function (deployer) {
   await deployer.deploy(Authentication);
   updateAddress(Authentication.address, Authentication.contractName);
-  await deployer.deploy(UpdateTr);
+  await deployer.deploy(UpdateTr, Authentication.address);
   updateAddress(UpdateTr.address, UpdateTr.contractName);
   await deployer.deploy(Production, Authentication.address, UpdateTr.address);
   updateAddress(Production.address, Production.contractName);

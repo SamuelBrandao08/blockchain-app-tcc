@@ -8,28 +8,29 @@ import { useWeb3Context } from "web3-react";
 
 //import api from "../../services/api";
 import "./style.css";
+import useConnect from "../../hooks/useConnect";
 
 export default function Login() {
-  const [login, setLogin] = useState("samuel");
+  const [user, setUser] = useState("samuel@email.com");
   const [password, setPassword] = useState("alunoufc");
   const history = useHistory("");
 
   const context = useWeb3Context();
-  context.setFirstValidConnector(["MetaMask"]);
-  const contract = useContract(abi, Authentication);
+  //const contract = useContract(abi, Authentication);
+  const { address, contract } = useConnect(abi, Authentication);
 
   async function handleLogin(e) {
     e.preventDefault();
 
     try {
       //const response = await api.post("session", { id });
-
-      if (!(context.active & contract));
-      const response = await contract.methods.logon(login, password).call();
+      //if (!context.active || contract === undefined);
+      const response = await contract.methods.logon(user, password).call();
       if (response[1]) {
         localStorage.setItem("userId", response[0].id);
         localStorage.setItem("userName", response[0].name);
         localStorage.setItem("userRole", response[0].role);
+        console.log(response);
         history.push("/home");
       } else {
         alert("Usuario ou senha incoretos!");
@@ -47,8 +48,8 @@ export default function Login() {
             <label htmlFor="basic-url">Login</label>
             <input
               placeholder="Usuário"
-              value={login}
-              onChange={(e) => setLogin(e.target.value)}
+              value={user}
+              onChange={(e) => setUser(e.target.value)}
             />
             <input
               placeholder="Senha"

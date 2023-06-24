@@ -1,16 +1,17 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { FiArrowLeft } from "react-icons/fi";
 import { Link, useHistory } from "react-router-dom";
 import { useWeb3Context } from "web3-react";
 import useContract from "../../hooks/useContract";
+import api from "../../services/api";
 
 import { abi } from "../../abi/Authentication.json";
 import { Authentication } from "../../abi/address.json";
 import Select from "react-select";
 import { profileConstants } from "../../constants/profileConstants";
 
-import api from "../../services/api";
 import "./style.css";
+import useConnect from "../../hooks/useConnect";
 
 var crypto = require("crypto");
 
@@ -22,62 +23,43 @@ const options = Object.values(profileConstants).map((profile) => ({
 export default function Register() {
   const [name, steName] = useState("Samuel Brandao");
   const [certification, setCertification] = useState("123");
-  const [company_name, setCompany_name] = useState("Apiario Morda Nova");
-  const [company_street, setCompany_street] = useState("Rua A");
-  const [company_city, setCompany_city] = useState("Morada Nova");
-  const [company_country, setCompany_country] = useState("Brasil");
-  const [login, setLogin] = useState("joao");
+  const [company, setCompany] = useState("Apiario Morda Nova");
+  const [email, setEmail] = useState("samuel@email.com");
   const [password, setPassword] = useState("alunoufc");
   const [role, setRole] = useState("produtor");
 
   const history = useHistory();
-  const context = useWeb3Context();
+  //const context = useWeb3Context();
+  //const contract = useContract(abi, Authentication);
+  const { address, contract } = useConnect(abi, Authentication);
 
-  context.setFirstValidConnector(["MetaMask"]);
-  const contract = useContract(abi, Authentication);
-
-  async function generateId() {
-    console.log("aqui");
-    do {
-      var _id = crypto.randomBytes(4).toString("HEX");
-      var response = await contract.methods.activeUser(_id).call();
-    } while (response);
-    return _id;
-  }
-
-  // useEffect(async () => {
-  //   var response = await contract.methods
-  //     .verifyPassword(login, password)
-  //     .call();
-  //   if (response) {
-  //     alert("Senha válida");
-  //   } else {
-  //     alert("Senha inválida");
-  //   }
-  // }, [password]);
+  // async function generateId() {
+  //   do {
+  //     var _id = crypto.randomBytes(4).toString("HEX");
+  //     var response = await contract.methods.activeUser(_id).call();
+  //     console.log("aqui");
+  //   } while (response);
+  //   return _id;
+  // }
 
   async function handleRegister(e) {
     e.preventDefault();
-    const id = await generateId();
+    console.log(address);
+    //const id = await generateId();
     try {
       //const response = await api.post("apicultor", data);
-      if (!(context.active & contract));
+      //if (!context.active) return;
       const response = await contract.methods
         .register(
-          [
-            context.account,
-            id,
-            name,
-            certification,
-            [company_name, company_street, company_city, company_country],
-            role,
-          ],
-          login,
+          [address, "", name, email, certification, company, role],
           password
         )
         .send({
-          from: context.account,
+          from: address,
+          gas: "800000",
         });
+
+      //api.post("/user", { id: id, address: context.account });
 
       console.log("Retorno: ", response.status);
       if (response.status) {
@@ -106,86 +88,48 @@ export default function Register() {
 
         <form onSubmit={handleRegister}>
           <div>
-            <div className="input-group">
-              <div>
-                <span>Nome</span>
-              </div>
-              <input
-                placeholder="nome"
-                value={name}
-                onChange={(e) => steName(e.target.value)}
-              />
-              <div>
-                <span>Certificação</span>
-              </div>
-              <input
-                placeholder="Certificação"
-                value={certification}
-                onChange={(e) => setCertification(e.target.value)}
-              />
-              <Select
-                defaultValue={role}
-                onChange={(e) => setRole(e.value)}
-                options={options}
-                placeholder="Tipo de usuário"
-              />
-            </div>
-            <div className="input-group">
-              <div>
-                <span>Usuário</span>
-              </div>
-              <input
-                type="text"
-                placeholder="Nome de usuário"
-                value={login}
-                onChange={(e) => setLogin(e.target.value)}
-              />
-              <div>
-                <span>Senha</span>
-              </div>
-              <input
-                placeholder="Senha"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            <div className="input-group">
-              <div>
-                <label htmlFor="basic-url">Empresa afiliada</label>
-              </div>
-              <div>
-                <span>Nome da Empresa</span>
-              </div>
-              <input
-                placeholder="Exemplo"
-                value={company_name}
-                onChange={(e) => setCompany_name(e.target.value)}
-              />
-              <div>
-                <span>Rua</span>
-              </div>
-              <input
-                placeholder="Rua"
-                value={company_street}
-                onChange={(e) => setCompany_street(e.target.value)}
-              />
-              <div>
-                <span>Cidade</span>
-              </div>
-              <input
-                placeholder="Cidade"
-                value={company_city}
-                onChange={(e) => setCompany_city(e.target.value)}
-              />
-              <div>
-                <span>País</span>
-              </div>
-              <input
-                placeholder="País"
-                value={company_country}
-                onChange={(e) => setCompany_country(e.target.value)}
-              />
-            </div>
+            <label htmlFor="">Nome Completo</label>
+            <input
+              placeholder=""
+              value={name}
+              onChange={(e) => steName(e.target.value)}
+            />
+
+            <label htmlFor="">Email</label>
+            <input
+              type="text"
+              placeholder=""
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+
+            <label htmlFor="">Certificação</label>
+            <input
+              placeholder="Certificação"
+              value={certification}
+              onChange={(e) => setCertification(e.target.value)}
+            />
+
+            <label htmlFor="">Empresa</label>
+            <input
+              placeholder=""
+              value={company}
+              onChange={(e) => setCompany(e.target.value)}
+            />
+
+            <label htmlFor="">Senha</label>
+            <input
+              placeholder="Senha"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+
+            <Select
+              defaultValue={role}
+              onChange={(e) => setRole(e.value)}
+              options={options}
+              placeholder="Tipo de usuário"
+            />
           </div>
           <button className="button" type="submit">
             Cadastrar

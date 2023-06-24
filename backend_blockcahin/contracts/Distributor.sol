@@ -5,50 +5,54 @@ import "./UpdateTr.sol";
 
 struct ReceivedUnit {
     string id;
-    string distributorId;
     string supplierId;
     string dateTime;
     string local;
+    UnitType unitType;
 }
 
-struct ReceivedContainer {
-    string id;
-    string[] units;
-    string supplierId;
-    string dateTime;
-    string local;
-} // Logistc Unit Received
+// struct ReceivedContainer {
+//     string id;
+//     string[] units;
+//     string supplierId;
+//     string dateTime;
+//     string local;
+//     string unitType;
+// } // Logistc Unit Received
 
 struct DispatchedUnit {
     string id;
-    string distributorId;
     string receiverId;
     string date;
     string local;
+    UnitType unitType;
 }
 
-struct DispachedContainer {
-    string id;
-    string[] units;
-    string distributorId;
-    string receiverId;
-    string date;
-    string local;
-}
+// struct DispachedContainer {
+//     string id;
+//     string[] units;
+//     string distributorId;
+//     string receiverId;
+//     string date;
+//     string local;
+//     string unitType;
+// }
+
+// enum UnitType {
+//     unidade,
+//     caixa,
+//     palete
+// }
 
 contract Distributor {
     //Variaveis de estado
     mapping(string => ReceivedUnit) receivedUnits; // Lista de containers recebidos para entrega por cada distribuidor.
+    // mapping(string => ReceivedContainer) receivedContainers; // Lista de containers recebidos para entrega por cada distribuidor.
     mapping(string => string[]) receivedUnitsId;
 
-    mapping(string => ReceivedContainer) receivedContainers; // Lista de containers recebidos para entrega por cada distribuidor.
-    mapping(string => string[]) receivedContainersId;
-
     mapping(string => DispatchedUnit) dispatchedUnits; // Lista de containers recebidos para entrega por cada distribuidor.
+    //mapping(string => DispachedContainer) dispatchedContainers; // Lista de containers recebidos para entrega por cada distribuidor.
     mapping(string => string[]) dispatchedUnitsId;
-
-    mapping(string => DispachedContainer) dispatchedContainers; // Lista de containers recebidos para entrega por cada distribuidor.
-    mapping(string => string[]) dispatchedContainersId;
 
     address contractAuthentication;
     Authentication instanceAuthentication;
@@ -71,121 +75,87 @@ contract Distributor {
         _;
     }
 
-    function registerReceivedUnit(
+    function receiver(
         string memory _id,
-        string memory _distributorId,
         string memory _supplierId,
         string memory _dateTime,
         string memory _local,
+        UnitType _unitType,
         string memory _userId
-    ) public onlyOWNER(_userId) {
+    ) private {
         receivedUnits[_id] = ReceivedUnit(
             _id,
-            _distributorId,
             _supplierId,
             _dateTime,
-            _local
+            _local,
+            _unitType
         );
         receivedUnitsId[_userId].push(_id);
     }
 
-    function registerReceivedContainer(
-        string memory _id,
-        string[] memory _units,
-        string memory _supplierId,
-        string memory _dateTime,
-        string memory _local,
-        string memory _userId
-    ) public onlyOWNER(_userId) {
-        receivedContainers[_id] = ReceivedContainer(
-            _id,
-            _units,
-            _supplierId,
-            _dateTime,
-            _local
-        );
-        receivedContainersId[_userId].push(_id);
-    }
-
-    function getReceivedContainer(
+    function getReceivedUnits(
         string memory _id
-    ) public view returns (ReceivedContainer memory) {
-        return receivedContainers[_id];
+    ) public view returns (ReceivedUnit memory) {
+        return receivedUnits[_id];
     }
 
-    function getReceivedContainerId(
+    function getReceivedUnitsId(
         string memory _userId
     ) public view returns (string[] memory) {
-        return receivedContainersId[_userId];
+        return receivedUnitsId[_userId];
     }
 
-    function registerDispachedUnit(
+    function listReceivedUnits(
+        string memory _userId
+    ) public view returns (ReceivedUnit[] memory) {
+        ReceivedUnit[] memory units = new ReceivedUnit[](
+            receivedUnitsId[_userId].length
+        );
+        for (uint256 i = 0; i < units.length; i++) {
+            units[i] = receivedUnits[receivedUnitsId[_userId][i]];
+        }
+        return units;
+    }
+
+    function dispatcher(
         string memory _id,
-        string memory _distributorId,
-        string memory _receiverId,
+        string memory _distributor,
+        string memory _receiver,
         string memory _dateTime,
         string memory _local,
-        string memory _userId
-    ) public onlyOWNER(_userId) {
+        UnitType _unitType
+    ) private {
         dispatchedUnits[_id] = DispatchedUnit(
             _id,
-            _distributorId,
-            _receiverId,
+            _receiver,
             _dateTime,
-            _local
+            _local,
+            _unitType
         );
-        dispatchedUnitsId[_userId].push(_id);
+        dispatchedUnitsId[_distributor].push(_id);
     }
 
-    function registerDispatchedContainer(
-        string memory _id,
-        string[] memory _units,
-        string memory _distributorId,
-        string memory _receiverId,
-        string memory _date,
-        string memory _local,
-        string memory _userId
-    ) public onlyOWNER(_userId) {
-        dispatchedContainers[_id] = DispachedContainer(
-            _id,
-            _units,
-            _distributorId,
-            _receiverId,
-            _date,
-            _local
-        );
-        dispatchedContainersId[_userId].push(_id);
-    }
-
-    function getDispatchedContainer(
+    function getDispatchedUnits(
         string memory _id
-    ) public view returns (DispachedContainer memory) {
-        return dispatchedContainers[_id];
+    ) public view returns (DispatchedUnit memory) {
+        return dispatchedUnits[_id];
     }
 
-    function getDispatchedContainerId(
+    function getDispatchedUnitsId(
         string memory _userId
     ) public view returns (string[] memory) {
-        return dispatchedContainersId[_userId];
+        return dispatchedUnitsId[_userId];
     }
 
-    //Função para registrar a tranzação de um produto
-    function forwarding(
-        string memory _sender,
-        string memory _receiver,
-        string memory _unitId,
-        string memory _date,
-        string memory _businessUnitType,
-        bytes memory _signature
-    ) public onlyOWNER(_receiver) {
-        //chamar funcao updateTr no contrato UpdateTr
-        instanceUpdateTr.updateTr(
-            _sender,
-            _receiver,
-            _unitId,
-            _date,
-            _businessUnitType,
-            _signature
+    function listDispatchedUnits(
+        string memory _userId
+    ) public view returns (DispatchedUnit[] memory) {
+        DispatchedUnit[] memory units = new DispatchedUnit[](
+            dispatchedUnitsId[_userId].length
         );
+        for (uint256 i = 0; i < units.length; i++) {
+            units[i] = dispatchedUnits[dispatchedUnitsId[_userId][i]];
+        }
+        return units;
     }
 }

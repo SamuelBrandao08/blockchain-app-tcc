@@ -5,6 +5,6 @@ const dirFront =
 const path = `${dirFront}` + `${file}`;
 
 const hashAddressList = JSON.parse(fs.readFileSync(path, "utf-8"));
-const hashAddressAuthentication = hashAddressList[Authentication];
-
-module.exports = hashAddressAuthentication;
+const hashAddressAuthentication = hashAddressList.Authentication;
+const hashAddressUpdateTr = hashAddressList.UpdateTr;
+module.exports = { hashAddressAuthentication, hashAddressUpdateTr };

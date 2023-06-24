@@ -1,5 +1,4 @@
 import React from "react";
-import MelTableRow from "../MelTableRow";
 
 // import { Container } from './styles';
 
@@ -8,7 +7,7 @@ function Product({ product, handleBack }) {
     console.log("produto ", product);
     if (!product) return;
     return product.map((product, i) => {
-      return <MelTableRow product={product} key={i} />;
+      return <div />;
     });
   }
   return (
