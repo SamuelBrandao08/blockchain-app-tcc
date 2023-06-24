@@ -1,0 +1,20 @@
+{
+  "users": [
+    {
+      "user": "76826232",
+      "product": {
+        "id": "2447409818",
+        "transactionHash": "0xb5f174e6c14ca2a53ca7b4d8c4e9754977a6a4f4d7cd1be00a41bd2644fd9844"
+      },
+      "id": 1
+    },
+    {
+      "user": "76826232",
+      "product": {
+        "id": "2447409818",
+        "transactionHash": "0xb5f174e6c14ca2a53ca7b4d8c4e9754977a6a4f4d7cd1be00a41bd2644fd9844"
+      },
+      "id": 2
+    }
+  ]
+}
