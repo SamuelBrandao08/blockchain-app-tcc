@@ -25,6 +25,16 @@
     margin-bottom: 32px ;
 }
 
+.login-container section.form .inputWrapper{
+    padding-bottom: 16px;
+}
+
+.login-container section.form .inputWrapper label{
+    padding-left: 20px;
+    color: #968a8a;
+    font-weight: 500;
+}
+
 .login-container section.form form a {
     display: flex;
     align-items: center;
@@ -38,7 +48,6 @@
 
 .login-container section.form form a svg {
     margin-right: 8px;
-
 }
 
 .login-container section.form form a:hover {
