@@ -1,7 +1,7 @@
 {
   "scripts": {
     "dev": "nodemon ./api/src/server.js",
-    "migrations": "truffle migrate --network ganache"
+    "migrations": "truffle migrate --network AWS"
   },
   "dependencies": {
     "@prisma/client": "^4.15.0",
