@@ -1,0 +1,49 @@
+{
+    "users": [
+        {
+            "login": {
+                "email": "samuel@gmail.com",
+                "password": "alunoufc"
+            },
+            "apiary": {
+                "id": "1"
+            }
+        },
+        {
+            "login": {
+                "email": "gabriel@gmail.com",
+                "password": "alunoufc"
+            },
+            "apiary": {
+                "id": "2"
+            }
+        },
+        {
+            "login": {
+                "email": "isaac@gmail.com",
+                "password": "alunoufc"
+            },
+            "apiary": {
+                "id": "3"
+            }
+        },
+        {
+            "login": {
+                "email": "pedro@gmail.com",
+                "password": "alunoufc"
+            },
+            "apiary": {
+                "id": "4"
+            }
+        },
+        {
+            "login": {
+                "email": "joao@gmail.com",
+                "password": "alunoufc"
+            },
+            "apiary": {
+                "id": "5"
+            }
+        }
+    ]
+}

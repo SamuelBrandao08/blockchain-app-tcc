@@ -33,6 +33,7 @@ module.exports = {
             phrase: mnemonicPhrase,
           },
           providerOrUrl: "http://3.210.145.39:8545",
+          gas: 8000000,
           skipDryRun: true,
           //derivationPath: "m/44'/60'/0'/0/",
         }),
