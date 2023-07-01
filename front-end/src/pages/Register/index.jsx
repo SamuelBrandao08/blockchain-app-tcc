@@ -9,9 +9,9 @@ import { abi } from "../../abi/Authentication.json";
 import { Authentication } from "../../abi/address.json";
 import Select from "react-select";
 import { profileConstants } from "../../constants/profileConstants";
-
-import "./style.css";
 import useConnect from "../../hooks/useConnect";
+
+import styles from "./style.module.scss";
 
 var crypto = require("crypto");
 
@@ -74,19 +74,21 @@ export default function Register() {
   }
 
   return (
-    <div className="register-container">
-      <div className="content">
+    <div className={styles.registerContainer}>
+      <div className={styles.content}>
         <section>
-          <h1>Cadastro</h1>
-          <p>Faça seu cadastro!</p>
-
           <Link className="back-link" to="/">
             <FiArrowLeft size={16} color="darkorange" />
             Voltar para o login
           </Link>
+          <div>
+            <h1>Faça seu cadastro</h1>
+            <p>Preencha os campos ao lado e comece a gerenciar sua colheita!</p>
+          </div>
         </section>
 
-        <form onSubmit={handleRegister}>
+        <form className={styles.form} onSubmit={handleRegister}>
+
           <div>
             <label htmlFor="">Nome Completo</label>
             <input
@@ -94,7 +96,9 @@ export default function Register() {
               value={name}
               onChange={(e) => steName(e.target.value)}
             />
+          </div>
 
+          <div>
             <label htmlFor="">Email</label>
             <input
               type="text"
@@ -102,35 +106,42 @@ export default function Register() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
+          </div>
 
+          <div>
             <label htmlFor="">Certificação</label>
             <input
               placeholder="Certificação"
               value={certification}
               onChange={(e) => setCertification(e.target.value)}
             />
+          </div>
 
+          <div>
             <label htmlFor="">Empresa</label>
             <input
               placeholder=""
               value={company}
               onChange={(e) => setCompany(e.target.value)}
             />
+          </div>
 
+          <div>
             <label htmlFor="">Senha</label>
             <input
               placeholder="Senha"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-
-            <Select
-              defaultValue={role}
-              onChange={(e) => setRole(e.value)}
-              options={options}
-              placeholder="Tipo de usuário"
-            />
           </div>
+
+          <Select
+            className={styles.select}
+            defaultValue={role}
+            onChange={(e) => setRole(e.value)}
+            options={options}
+            placeholder="Tipo de usuário"
+          />
           <button className="button" type="submit">
             Cadastrar
           </button>

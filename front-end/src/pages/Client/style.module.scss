@@ -1,0 +1,50 @@
+.container {
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 32px;
+  gap: 32px;
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  margin-left: auto;
+}
+
+.content {
+  width: 500px;
+}
+
+.searchHoneyContainer {
+  width: 500px;
+  display: grid;
+  gap: 32px;
+
+  ul {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  li {
+    display: flex;
+    gap: 8px;
+
+    span {
+      font-weight: 700;
+      color: #686b71;
+      text-transform: lowercase;
+    }
+
+    p {
+      color: #292929;
+    }
+  }
+}

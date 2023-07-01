@@ -20,6 +20,7 @@
     "react-scripts": "4.0.3",
     "react-select": "^5.7.0",
     "react-tabs": "^3.2.3",
+    "sass": "^1.63.6",
     "web-vitals": "^1.1.2",
     "web3": "^1.8.1",
     "web3-react": "^5.0.5"

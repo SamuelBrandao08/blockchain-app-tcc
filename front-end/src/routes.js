@@ -6,7 +6,7 @@ import Home from "./pages/Home";
 import Drum from "./pages/Home/Producer/new/Drum";
 import Honey from "./pages/Home/Processor/new/Honey";
 
-import Client from "./pages/Client/Client";
+import { Client } from "./pages/Client/Client";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ProducerTransaction from "./pages/Home/Producer/Transaction";

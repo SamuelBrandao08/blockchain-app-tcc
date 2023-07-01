@@ -1,40 +1,97 @@
 import React, { useState } from "react";
 
-const SearchHoney = ({ product, production, hives }) => {
+export const SearchHoney = ({ product, production, hives }) => {
   return (
-    <div className="home-container">
-      <div className="content">
-        <div>
-          <ul>
-            <li>ID: {product?.id}</li>
-            <li>LOTE: {product?.lote}</li>
-            <li>CODIGO: {product?.codigo}</li>
-            <li>ORIGEM: {product?.feedstockBatch}</li>
-            <li>TIPO: {product?.honeyType}</li>
-            <li>VARIEDADE: {product?.variety}</li>
-            <li>PESO: {product?.weight}</li>
-            <li>RECIPIENTE: {product?.packaging}</li>
-            <li>VALIDADE: {product?.validity}</li>
-            <li>COMPOSIÇÃO: {product?.composition}</li>
-          </ul>
-        </div>
-      </div>
+    <div className="searchHoneyContainer">
       <div>
         <ul>
-          <li>ID: {production.id}</li>
-          <li>LOTE: {production.batch}</li>
-          <li>CODIGO: {production.code}</li>
-          <li>PRODUTOR: {production.productorId}</li>
-          <li>APIÁRIO: {production.apiary}</li>
-          <li>PESO: {production.weight}</li>
-          <li>RECIPIENTE: {production.packing}</li>
-          <li>FLORADA: {production.flowering}</li>
-          <li>DATA: {production.date}</li>
-          <li>COLMEIAS: {production.hivesId}</li>
+          <li>
+            <span>ID:</span>
+            <p>{product?.id}</p>
+          </li>
+          <li>
+            <span>LOTE:</span>
+            <p>{product?.lote}</p>
+          </li>
+          <li>
+            <span>CÓDIGO:</span>
+            <p>{product?.codigo}</p>
+          </li>
+          <li>
+            <span>ORIGEM:</span>
+            <p>{product?.feedstockBatch}</p>
+          </li>
+          <li>
+            <span>TIPO:</span>
+            <p>{product?.honeyType}</p>
+          </li>
+          <li>
+            <span>VARIEDADE:</span>
+            <p>{product?.variety}</p>
+          </li>
+          <li>
+            <span>PESO:</span>
+            <p>{product?.weight}</p>
+          </li>
+          <li>
+            <span>RECIPIENTE:</span>
+            <p>{product?.packaging}</p>
+          </li>
+          <li>
+            <span>VALIDADE:</span>
+            <p>{product?.validity}</p>
+          </li>
+          <li>
+            <span>COMPOSIÇÃO:</span>
+            <p>{product?.composition}</p>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <ul>
+          <li>
+            <span>ID:</span>
+            <p>{production.id}</p>
+          </li>
+          <li>
+            <span>LOTE:</span>
+            <p>{production.batch}</p>
+          </li>
+          <li>
+            <span>CODIGO:</span>
+            <p>{production.code}</p>
+          </li>
+          <li>
+            <span>PRODUTOR:</span>
+            <p>{production.productorId}</p>
+          </li>
+          <li>
+            <span>APIÁRIO:</span>
+            <p>{production.apiary}</p>
+          </li>
+          <li>
+            <span>PESO:</span>
+            <p>{production.weight}</p>
+          </li>
+          <li>
+            <span>RECIPIENTE:</span>
+            <p>{production.packing}</p>
+          </li>
+          <li>
+            <span>FLORADA:</span>
+            <p>{production.flowering}</p>
+          </li>
+          <li>
+            <span>DATA:</span>
+            <p>{production.date}</p>
+          </li>
+          <li>
+            <span>COLMEIAS:</span>
+            <p>{production.hivesId}</p>
+          </li>
         </ul>
       </div>
     </div>
   );
 };
-
-export default SearchHoney;

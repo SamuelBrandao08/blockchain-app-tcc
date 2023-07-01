@@ -1,13 +1,13 @@
 import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { FiLogIn } from "react-icons/fi";
 import { Link, useHistory } from "react-router-dom";
-
-//import api from "../../services/api";
-import "./style.css";
 import { useAuth } from "../../contexts/AuthContext";
 
+//import api from "../../services/api";
+import styles from "./style.module.scss";
+
 export default function Login() {
-  const {signIn, user} = useAuth()
+  const { signIn, user } = useAuth()
   const [login, setLogin] = useState("samuel");
   const [password, setPassword] = useState("alunoufc");
   const history = useHistory("");
@@ -21,12 +21,13 @@ export default function Login() {
   }
 
   return (
-    <div className="login-container">
-      <section className="form">
+    <div className={styles.container}>
+      <section className={styles.form}>
+        <h1>Faça seu login</h1>
         <form onSubmit={handleLogin}>
           <div>
-            <div className="inputWrapper">
-              <label htmlFor="login">Login</label>
+            <div className={styles.inputWrapper}>
+              <label htmlFor="login">Nome</label>
               <input
                 name="login"
                 placeholder="Usuário"
@@ -34,7 +35,7 @@ export default function Login() {
                 onChange={(e) => setLogin(e.target.value)}
               />
             </div>
-            <div className="inputWrapper">
+            <div className={styles.inputWrapper}>
               <label htmlFor="password">Senha</label>
               <input
                 placeholder="Senha"
