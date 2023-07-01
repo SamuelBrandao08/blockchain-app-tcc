@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { useState } from "react";
 import { FiLogIn } from "react-icons/fi";
 import { Link, useHistory } from "react-router-dom";
 import { useAuth } from "../../contexts/AuthContext";
@@ -7,8 +7,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import styles from "./style.module.scss";
 
 export default function Login() {
-  const { signIn, user } = useAuth()
-  const [login, setLogin] = useState("samuel");
+  const { signIn } = useAuth()
+  const [login, setLogin] = useState("samuel@email.com");
   const [password, setPassword] = useState("alunoufc");
   const history = useHistory("");
 

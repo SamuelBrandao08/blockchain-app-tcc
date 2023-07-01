@@ -8,7 +8,7 @@ import useConnect from "../hooks/useConnect";
 export const AuthContext = createContext({})
 
 export default function AuthContextProvider({ children }) {
-  const [user, setUser] = useState({})
+  const [user, setUser] = useState(null)
 
   // const context = useWeb3Context();
   // context.setFirstValidConnector(["MetaMask"]);
@@ -18,7 +18,6 @@ export default function AuthContextProvider({ children }) {
   useEffect(() => {
     function loadStorageData() {
       const storageUser = localStorage.getItem('@user')
-      console.log("Storage", storageUser);
       if (storageUser) {
         setUser(JSON.parse(storageUser))
       }
@@ -31,8 +30,9 @@ export default function AuthContextProvider({ children }) {
       if (!(contract)) return;
       const { 0: userWeb3, 1: isLogged } = await contract.methods.logon(login, password).call();
       if (isLogged) {
-        setUser(userWeb3)
-        localStorage.setItem("@user", JSON.stringify(userWeb3));
+        const user = parseUser(userWeb3)
+        setUser(user)
+        localStorage.setItem("@user", JSON.stringify(user));
         return user
       } else {
         alert("Usuário ou senha incorretos!");
@@ -42,12 +42,30 @@ export default function AuthContextProvider({ children }) {
       alert("Falha no login, tente novamente!");
     }
   }
+
+  function signOut() {
+    localStorage.clear();
+    setUser(null);
+    // context.unsetConnector();
+    // history.push("/");
+  }
+
   return (
-    <AuthContext.Provider value={{ user, signIn }}>
+    <AuthContext.Provider value={{ user, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   )
 }
+
+const parseUser = (user) => Object({
+  id: user?.id,
+  addr: user?.addr,
+  name: user?.name,
+  email: user?.email,
+  company: user?.company,
+  certification: user?.certification,
+  role: user?.role,
+});
 
 export function useAuth() {
   const context = useContext(AuthContext)
