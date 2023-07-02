@@ -13,6 +13,7 @@ import HoneyProduction from "./Componentes/Production/HoneyProduction";
 import DispatchedProducts from "./Componentes/Dispatched/DispatchedProducts";
 import ProducerTracing from "./Componentes/ProducerTracing";
 import useWallet from "../../../hooks/useConnect";
+import useConnect from "../../../hooks/useConnect";
 
 function HomeProducer({ userId, userName }) {
   //console.log(userName, userId);
@@ -32,12 +33,13 @@ function HomeProducer({ userId, userName }) {
   const [selectedBatch, setSelectedBatch] = useState("");
 
   const context = useWeb3Context();
-  const contract = useContract(PRC.abi, Production);
+  //const contract = useContract(PRC.abi, Production);
+  const { contract } = useConnect(PRC.abi, Production);
 
   useEffect(() => {
     getBatchs();
     listDispatched();
-  }, [contract]);
+  }, [selectedBatch]);
 
   useEffect(() => {
     if (batchs.length === 0) return;
@@ -48,6 +50,7 @@ function HomeProducer({ userId, userName }) {
   const getBatchs = async () => {
     if (contract !== null) {
       const response = await contract.methods.getDrumBatchs(userId).call();
+      if (response == 0) return;
       const options = response.map((i) => ({
         label: i,
         value: i,

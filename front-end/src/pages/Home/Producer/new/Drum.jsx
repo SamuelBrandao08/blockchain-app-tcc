@@ -9,7 +9,7 @@ import TUC from "../../../../abi/UpdateTr.json";
 import { Production } from "../../../../abi/address.json";
 import { UpdateTr } from "../../../../abi/address.json";
 import DatePicker from "react-datepicker";
-import { format, parseJSON } from "date-fns";
+import { format } from "date-fns";
 import "react-datepicker/dist/react-datepicker.css";
 import Select from "react-select";
 
@@ -66,6 +66,7 @@ function Drum() {
   const getBatchs = async () => {
     if (!contract) return;
     const response = await contract.methods.getDrumBatchs(userId).call();
+    if (response == 0) return;
     const options = response.map((i) => ({
       label: i,
       value: i,
@@ -77,15 +78,17 @@ function Drum() {
   console.log("lote selecionado ", selectedBatch);
 
   useEffect(() => {
-    console.log("response ", response);
+    console.log("response ", response.length);
     if (response.length < 2) return;
     const data = {
       user: userId,
-      product: { id: response[1], transactionHash: response[0] },
+      product: { id: response[0], transactionHash: response[1] },
     };
     console.log(data);
     api.post(`/users`, data, { "Content-Type": "aplication-json" });
+    setResponse([]);
   }, [response]);
+
   const handleNewDrum = async (e) => {
     e.preventDefault();
     try {
@@ -108,7 +111,8 @@ function Drum() {
           from: address,
           gas: "800000",
         });
-      setResponse([transactionHash]);
+      //setResponse([...response, transactionHash]);
+      setResponse((state) => [...state, transactionHash]);
 
       alert("Success!");
     } catch (error) {

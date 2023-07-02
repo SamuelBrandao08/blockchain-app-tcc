@@ -9953,15 +9953,21 @@
     "version": "0.8.17+commit.8df45f5f.Emscripten.clang"
   },
   "networks": {
+    "5045": {
+      "events": {},
+      "links": {},
+      "address": "0xB1D4023f6c4439dbd776A96581DB6D4fb3CCfE96",
+      "transactionHash": "0x317653ac14cf98963fa86d25f8e47ad1c7dbb277a05d14f282d2d7ff89fd36a4"
+    },
     "5777": {
       "events": {},
       "links": {},
-      "address": "0xAb189F66e140F845e9257AdB13f7cAF4285d418b",
-      "transactionHash": "0xe5d4f03afbb1b63cb7c379c0fefac23374002131f383fc2af6e8dd3c6492e3e8"
+      "address": "0x12a3d789a96bF5fE38b3199f18Af17aa077549e9",
+      "transactionHash": "0xf4fb2046312bba3de087aa7049d84819d22408231e4cd038be4cba01987a3646"
     }
   },
   "schemaVersion": "3.4.11",
-  "updatedAt": "2023-06-23T06:21:32.714Z",
+  "updatedAt": "2023-06-29T08:44:31.643Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},
