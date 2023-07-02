@@ -16,6 +16,7 @@ import Select from "react-select";
 import useConnect from "../../../../hooks/useConnect";
 import useEvent from "../../../../hooks/useEvent";
 import api from "../../../../services/api";
+import { Header } from "../../../../components/Header";
 
 var crypto = require("crypto");
 //import { Container } from "./style";
@@ -45,6 +46,7 @@ function Drum() {
   const generateBatch = async (e) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log(contract);
     try {
       if (!contract) return;
       //var _batch = crypto.randomBytes(4).toString("HEX");
@@ -138,6 +140,8 @@ function Drum() {
 
   return (
     <div className="new-honey-container">
+      <Header />
+
       <div>
         <section>
           <h1>Cadastrar novo mel</h1>

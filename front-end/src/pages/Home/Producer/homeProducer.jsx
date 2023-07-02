@@ -91,11 +91,6 @@ function HomeProducer({ userId, userName }) {
 
   return (
     <div className="profile-container">
-      <div className="container-register">
-        <Link className="button" to="/producer/new/drum">
-          Registrar Produção
-        </Link>
-      </div>
       <div>
         <div>
           <HoneyProduction
@@ -105,7 +100,7 @@ function HomeProducer({ userId, userName }) {
             batchs={batchs}
             setBatchs={setBatchs}
             contract={contract}
-            // listProduct={listProduct}
+          // listProduct={listProduct}
           />
 
           {/* {product.length && (
@@ -123,10 +118,6 @@ function HomeProducer({ userId, userName }) {
             <button type="submit">Search</button>
           </form>
         </div> */}
-
-        <Link className="button" to="/producer/transaction">
-          Despachar Produção
-        </Link>
       </div>
       <div>
         <DispatchedProducts

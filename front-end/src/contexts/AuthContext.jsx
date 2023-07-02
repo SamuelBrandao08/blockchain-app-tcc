@@ -8,7 +8,7 @@ import useConnect from "../hooks/useConnect";
 export const AuthContext = createContext({})
 
 export default function AuthContextProvider({ children }) {
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState()
 
   // const context = useWeb3Context();
   // context.setFirstValidConnector(["MetaMask"]);
@@ -45,7 +45,7 @@ export default function AuthContextProvider({ children }) {
 
   function signOut() {
     localStorage.clear();
-    setUser(null);
+    setUser(undefined);
     // context.unsetConnector();
     // history.push("/");
   }

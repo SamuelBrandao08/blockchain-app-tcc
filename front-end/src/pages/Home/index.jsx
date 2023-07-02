@@ -20,16 +20,16 @@ export default function Home() {
 
   return (
     <div>
-      <div className="profile-container">
+      <div className={styles.container}>
         <Header />
-      </div>
-      <div>
-        {user.role === profileConstants.PRODUCER && (
-          <HomeProducer userId={user.id} userName={user.name} />
-        )}
-        {user.role === profileConstants.PROCESSOR && <HomeProcessor />}
-        {user.role === profileConstants.DISTRIBUTOR && <HomeDistributor />}
-        {user.role === profileConstants.MERCHANT && <HomeMerchant />}
+        <div>
+          {user.role === profileConstants.PRODUCER && (
+            <HomeProducer userId={user.id} userName={user.name} />
+          )}
+          {user.role === profileConstants.PROCESSOR && <HomeProcessor />}
+          {user.role === profileConstants.DISTRIBUTOR && <HomeDistributor />}
+          {user.role === profileConstants.MERCHANT && <HomeMerchant />}
+        </div>
       </div>
     </div>
   );

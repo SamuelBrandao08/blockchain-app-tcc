@@ -12,7 +12,7 @@ export function Header() {
       <span>Bem vindo,{" "}
         <strong>{user.name}</strong>
       </span>
-      {/* <Navbar /> */}
+      <Navbar />
       <button className="back-link" onClick={signOut}>
         <FiLogIn size={16} color="darkorange" />
         Sair

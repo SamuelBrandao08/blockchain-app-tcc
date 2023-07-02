@@ -20,7 +20,7 @@ const options = Object.values(profileConstants).map((profile) => ({
   value: profile,
 }));
 
-export default function Register() {
+export function Register() {
   const [name, steName] = useState("Samuel Brandao");
   const [certification, setCertification] = useState("123");
   const [company, setCompany] = useState("Apiario Morda Nova");
