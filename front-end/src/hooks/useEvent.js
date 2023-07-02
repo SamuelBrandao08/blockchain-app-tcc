@@ -13,7 +13,8 @@ const useEvent = (contract) => {
       )
       .on("data", async function (event) {
         console.log(event.returnValues.unit);
-        setResponse((state) => [...state, event.returnValues.unit]);
+        //setResponse((state) => [...state, event.returnValues.unit]);
+        setResponse([event.returnValues.unit]);
       })
       .on("error", function (error, receipt) {
         // If the transaction was rejected by the network with a receipt, the second parameter will be the receipt.
