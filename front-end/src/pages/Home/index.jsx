@@ -19,18 +19,15 @@ export default function Home() {
   const { user } = useAuth()
 
   return (
-    <div>
-      <div className={styles.container}>
-        <Header />
-        <div>
-          {user.role === profileConstants.PRODUCER && (
-            <HomeProducer userId={user.id} userName={user.name} />
-          )}
-          {user.role === profileConstants.PROCESSOR && <HomeProcessor />}
-          {user.role === profileConstants.DISTRIBUTOR && <HomeDistributor />}
-          {user.role === profileConstants.MERCHANT && <HomeMerchant />}
-        </div>
-      </div>
+    <div className={styles.container}>
+      <Header />
+
+      {user.role === profileConstants.PRODUCER && (
+        <HomeProducer userId={user.id} userName={user.name} />
+      )}
+      {user.role === profileConstants.PROCESSOR && <HomeProcessor />}
+      {user.role === profileConstants.DISTRIBUTOR && <HomeDistributor />}
+      {user.role === profileConstants.MERCHANT && <HomeMerchant />}
     </div>
   );
 }

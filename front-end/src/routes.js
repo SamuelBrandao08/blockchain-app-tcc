@@ -3,7 +3,7 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 
 //import Client from './pages/Client';
 import Home from "./pages/Home";
-import Drum from "./pages/Home/Producer/new/Drum";
+import { Drum } from "./pages/Home/Producer/new/Drum";
 import Honey from "./pages/Home/Processor/new/Honey";
 
 import { Client } from "./pages/Client/Client";

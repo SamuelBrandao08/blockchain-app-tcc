@@ -1,3 +1,20 @@
 {
-  "users": []
+  "users": [
+    {
+      "user": "78745843",
+      "product": {
+        "id": "404866601",
+        "transactionHash": "0x14a1cab3c18b17471aff2a48c365dfc96f5326f2852c36d5ef1b9f1c9b6fd498"
+      },
+      "id": 1
+    },
+    {
+      "user": "78745843",
+      "product": {
+        "id": "404866602",
+        "transactionHash": "0xc9d320b918f4c03f03702d5b30b231d74a7f7392de136a927ba5f461842c42e0"
+      },
+      "id": 2
+    }
+  ]
 }
