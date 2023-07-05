@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 //import { FiPower } from "react-icons/fi";
 
-import "./style.css";
+import styles from "./style.module.scss";
 import api from "../../services/api";
 import { useWeb3Context } from "web3-react";
 
@@ -12,41 +12,22 @@ import HomeProducer from "./Producer/homeProducer";
 import HomeDistributor from "./Distributor/homeDistributor";
 import HomeProcessor from "./Processor/homeProcessor";
 import HomeMerchant from "./Merchant/homeMerchant";
+import { useAuth } from "../../contexts/AuthContext";
+import { Header } from "../../components/Header";
 
 export default function Home() {
-  const context = useWeb3Context();
-  const history = useHistory("");
-
-  const userId = localStorage.getItem("userId");
-  const userName = localStorage.getItem("userName");
-  const userRole = localStorage.getItem("userRole");
-
-  console.log("id: ", userId + "\nnome: ", userName + "\nrole: ", userRole);
-
-  function handleLogout() {
-    localStorage.clear();
-    context.unsetConnector();
-    history.push("/");
-  }
+  const { user } = useAuth()
 
   return (
-    <div>
-      <div className="profile-container">
-        <header>
-          <span>Bem vindo, {userName}</span>
-          <button onClick={handleLogout} type="button" size={18}>
-            sair
-          </button>
-        </header>
-      </div>
-      <div>
-        {userRole === profileConstants.PRODUCER && (
-          <HomeProducer userId={userId} userName={userName} />
-        )}
-        {userRole === profileConstants.PROCESSOR && <HomeProcessor />}
-        {userRole === profileConstants.DISTRIBUTOR && <HomeDistributor />}
-        {userRole === profileConstants.MERCHANT && <HomeMerchant />}
-      </div>
+    <div className={styles.container}>
+      <Header />
+
+      {user.role === profileConstants.PRODUCER && (
+        <HomeProducer userId={user.id} userName={user.name} />
+      )}
+      {user.role === profileConstants.PROCESSOR && <HomeProcessor />}
+      {user.role === profileConstants.DISTRIBUTOR && <HomeDistributor />}
+      {user.role === profileConstants.MERCHANT && <HomeMerchant />}
     </div>
   );
 }

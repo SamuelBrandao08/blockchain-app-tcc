@@ -1,8 +1,15 @@
-.profile-container {
-    width: 100%;
-    max-width: 1180px;
-    padding: 0 30px;
-    margin: 32px auto;
+.container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin: 32px;
+}
+
+.filters {
+    .select {
+        width: 300px;
+    }
 }
 
 .container-registar {
@@ -48,7 +55,7 @@
     color: #41414d;
 }
 
-.profile-container ul li p + strong {
+.profile-container ul li p+strong {
     margin-top: 32px;
 }
 

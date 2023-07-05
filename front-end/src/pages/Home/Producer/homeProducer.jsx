@@ -5,15 +5,85 @@ import useContract from "../../../hooks/useContract";
 import PRC from "../../../abi/Production.json";
 import { Production } from "../../../abi/address.json";
 
-import "./style.css";
+import styles from "./style.module.scss";
 import api from "../../../services/api";
 import { useWeb3Context } from "web3-react";
 import { FiArrowLeft } from "react-icons/fi";
 import HoneyProduction from "./Componentes/Production/HoneyProduction";
 import DispatchedProducts from "./Componentes/Dispatched/DispatchedProducts";
-import ProducerTracing from "./Componentes/ProducerTracing";
+import ProducerTracing from "./Componentes/ProducerTracing/ProducerTracing";
 import useWallet from "../../../hooks/useConnect";
 import useConnect from "../../../hooks/useConnect";
+import { DataGrid as MuiDataGrid, ptBR } from "@mui/x-data-grid";
+import { styled } from "@mui/material";
+import Select from "react-select";
+import { format } from "date-fns";
+
+const DataGrid = styled(MuiDataGrid)`
+  .MuiDataGrid-columnHeaders{
+    min-height: 35px !important;
+    background-color: #E0E0E0;
+  }
+  .MuiDataGrid-columnSeparator--sideRight{
+    display: none !important;
+  }
+
+  .MuiDataGrid-footerContainer{
+    min-height: 32px;
+    height: 32px;
+    background-color: #F5F5F5;
+  }
+`;
+
+const columns = [
+  {
+    field: 'code',
+    headerName: 'Código',
+    sortable: false,
+  },
+  {
+    field: 'batch',
+    headerName: 'Lote',
+    sortable: false,
+  },
+  {
+    field: 'packing',
+    headerName: 'Recipiente',
+    sortable: false,
+    flex: 1,
+  },
+  {
+    field: 'flowering',
+    headerName: 'Florada',
+    sortable: false,
+    flex: 1
+  },
+  {
+    field: 'date',
+    headerName: 'Fabricação',
+    sortable: false,
+    flex: 1,
+    valueFormatter: ({ value }) => format(new Date(value), "dd/mm/yyyy 'às' HH:mm")
+  },
+  {
+    field: 'productorId',
+    headerName: 'Produtor',
+    sortable: false,
+  },
+  {
+    field: 'weight',
+    headerName: 'Peso',
+    sortable: false,
+    valueFormatter: ({ value }) => `${value} kg`
+  },
+  {
+    field: 'hivesId',
+    headerName: 'Colmeias',
+    sortable: false,
+    align: 'right',
+    width: 80
+  },
+]
 
 function HomeProducer({ userId, userName }) {
   //console.log(userName, userId);
@@ -26,11 +96,11 @@ function HomeProducer({ userId, userName }) {
   const [palletId, setPalletId] = useState([]);
   const [pallet, setPallet] = useState({});
 
-  const [dispatcheds, setDispatcheds] = useState([]);
+  const [dispatched, setDispatched] = useState([]);
   const [product, setProduct] = useState([]);
 
   const [batchs, setBatchs] = useState([]);
-  const [selectedBatch, setSelectedBatch] = useState("");
+  // const [selectedBatch, setSelectedBatch] = useState("");
 
   const context = useWeb3Context();
   //const contract = useContract(PRC.abi, Production);
@@ -39,14 +109,8 @@ function HomeProducer({ userId, userName }) {
   useEffect(() => {
     getBatchs();
     listDispatched();
-  }, [selectedBatch]);
+  }, []);
 
-  useEffect(() => {
-    if (batchs.length === 0) return;
-    listDrums();
-  }, [selectedBatch]);
-
-  console.log("lote", selectedBatch);
   const getBatchs = async () => {
     if (contract !== null) {
       const response = await contract.methods.getDrumBatchs(userId).call();
@@ -56,13 +120,13 @@ function HomeProducer({ userId, userName }) {
         value: i,
       }));
       setBatchs(options.reverse());
-      setSelectedBatch(options[0].value);
+      // setSelectedBatch(options[0].value);
     }
   };
 
-  const listDrums = async () => {
+  const listDrums = async (batch) => {
     if (contract !== null) {
-      const response = await contract.methods.listDrums(selectedBatch).call();
+      const response = await contract.methods.listDrums(batch).call();
       setDrums(response);
     }
   };
@@ -70,7 +134,7 @@ function HomeProducer({ userId, userName }) {
   const listDispatched = async () => {
     if (contract !== null) {
       const response = await contract.methods.listDispatched(userId).call();
-      setDispatcheds(response);
+      setDispatched(response);
     }
   };
 
@@ -93,28 +157,51 @@ function HomeProducer({ userId, userName }) {
   };
 
   return (
-    <div className="profile-container">
-      <div className="container-register">
-        <Link className="button" to="/producer/new/drum">
-          Registrar Produção
-        </Link>
+    <div className={styles.container}>
+      <div className={styles.filters}>
+        <Select
+          className={styles.select}
+          // defaultValue={selectedBatch}
+          onChange={(e) => listDrums(e.value)}
+          options={batchs ?? [{ label: "carregando..." }]}
+          placeholder="Selecione o lote"
+        />
       </div>
-      <div>
-        <div>
-          <HoneyProduction
-            drums={drums}
-            selectedBatch={selectedBatch}
-            setSelectedBatch={setSelectedBatch}
-            batchs={batchs}
-            setBatchs={setBatchs}
-            contract={contract}
-            // listProduct={listProduct}
-          />
+      <div style={{ width: '100%', height: '30%' }}>
+        <DataGrid
+          columns={columns}
+          rows={drums}
+          localeText={
+            ptBR.components.MuiDataGrid.defaultProps.localeText
+          }
+          hideFooter
+          columnHeaderHeight={40}
+          rowHeight={50}
+          hideFooterSelectedRowCount={false}
+          disableColumnMenu={true}
+          showColumnRightBorder={false}
+          disableRowSelectionOnClick
+          disableSelectionOnClick
+          loading={false}
+        // components={{
+        //   Pagination,
+        //   Cell: isFetching ? CustomSkeleton : GridCell,
+        // }}
+        />
+        {/* <HoneyProduction
+          drums={drums}
+          selectedBatch={selectedBatch}
+          setSelectedBatch={setSelectedBatch}
+          batchs={batchs}
+          setBatchs={setBatchs}
+          contract={contract}
+        // listProduct={listProduct}
+        /> */}
 
-          {/* {product.length && (
+        {/* {product.length && (
             <Product product={product} handleBack={() => setProduct([])} />
           )} */}
-        </div>
+
         {/* <div>
           <form onSubmit={handleGetDrum}>
             <input
@@ -126,15 +213,11 @@ function HomeProducer({ userId, userName }) {
             <button type="submit">Search</button>
           </form>
         </div> */}
-
-        <Link className="button" to="/producer/transaction">
-          Despachar Produção
-        </Link>
       </div>
       <div>
         <DispatchedProducts
-          dispatcheds={dispatcheds}
-          setDispatcheds={setDispatcheds}
+          dispatched={dispatched}
+          setDispatched={setDispatched}
         />
       </div>
       <div>

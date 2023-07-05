@@ -16,14 +16,14 @@ import Select from "react-select";
 import useConnect from "../../../../hooks/useConnect";
 import useEvent from "../../../../hooks/useEvent";
 import api from "../../../../services/api";
+import { Header } from "../../../../components/Header";
+import { useAuth } from "../../../../contexts/AuthContext";
 
 var crypto = require("crypto");
 //import { Container } from "./style";
 
-function Drum() {
-  const userId = localStorage.getItem("userId");
-  console.log("user", userId);
-
+export function Drum() {
+  const { user } = useAuth();
   const history = useHistory();
   const context = useWeb3Context();
   //const prc = useContract(PRC.abi, Production);
@@ -36,6 +36,7 @@ function Drum() {
   const [weight, setWeight] = useState(20);
   const [packing, setPacking] = useState("Tambor de plastico");
   const [flowering, setflowering] = useState("Jandaira");
+
   const [startDate, setStartDate] = useState(new Date());
   const [hivesId, setHivesId] = useState("1,2");
 
@@ -45,12 +46,18 @@ function Drum() {
   const generateBatch = async (e) => {
     e.preventDefault();
     e.stopPropagation();
+    console.log(contract);
     try {
       if (!contract) return;
       //var _batch = crypto.randomBytes(4).toString("HEX");
-      const response = await contract.methods
-        .generateBatch(userId, flowering)
-        .send({ from: address, gas: "800000" });
+      contract.methods
+        .generateBatch(user.id, flowering)
+        .send({ from: address, gas: "800000" })
+        .then(({ status }) => {
+          if (status === true) {
+            getBatchs();
+          }
+        });
     } catch (error) {
       console.log(error);
       alert("Erro na operação.");
@@ -63,7 +70,7 @@ function Drum() {
 
   const getBatchs = async () => {
     if (!contract) return;
-    const response = await contract.methods.getDrumBatchs(userId).call();
+    const response = await contract.methods.getDrumBatchs(user.id).call();
     if (response == 0) return;
     const options = response.map((i) => ({
       label: i,
@@ -79,7 +86,7 @@ function Drum() {
     console.log("response ", response.length);
     if (response.length < 2) return;
     const data = {
-      user: userId,
+      user: user.id,
       product: { id: response[0], transactionHash: response[1] },
     };
     console.log(data);
@@ -95,10 +102,10 @@ function Drum() {
         const datetime = format(new Date(startDate), "dd/MM/yyyy-HH:mm:ss");
         console.log("Lote", selectedBatch);
 
-        eventsListen(userId, setResponse);
+        eventsListen(user.id, setResponse);
         const { transactionHash } = await contract.methods
           .newDrum(
-            userId,
+            user.id,
             selectedBatch,
             code,
             weight,
@@ -125,19 +132,19 @@ function Drum() {
 
   const handleNewPallet = async (e) => {
     e.preventDefault();
-    eventsListen(userId, setResponse);
+    eventsListen(user.id, setResponse);
     try {
       if (!contract) return;
       const ids = drumsId.split(",");
       console.log(ids);
       const { transactionHash } = await contract.methods
-        .newPallet(userId, selectedBatch, ids)
+        .newPallet(user.id, selectedBatch, ids)
         .send({
           from: address,
           gas: "800000",
         });
       setResponse([transactionHash]);
-      //api.post(`product/user/${userId}`, response);
+      //api.post(`product/user/${user.id}`, response);
     } catch (error) {
       alert("Erro na operação");
     }
@@ -145,6 +152,8 @@ function Drum() {
 
   return (
     <div className="new-honey-container">
+      <Header />
+
       <div>
         <section>
           <h1>Cadastrar novo mel</h1>
@@ -241,5 +250,3 @@ function Drum() {
     </div>
   );
 }
-
-export default Drum;

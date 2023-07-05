@@ -2,12 +2,14 @@ import React, { useState } from "react";
 import PRC from "../../abi/Production.json";
 import PSC from "../../abi/Processing.json";
 import { Production, Processing } from "../../abi/address.json";
-import SearchHoney from "./SearchHoney";
+import { SearchHoney } from "./SearchHoney";
 import useConnect from "../../hooks/useConnect";
 import { FiLogIn } from "react-icons/fi";
 import { Link } from "react-router-dom/cjs/react-router-dom.min";
 
-const Client = () => {
+import styles from "./style.module.scss";
+
+export const Client = () => {
   const [unit, setUnit] = useState("");
   const [product, setProduct] = useState([]);
   const [production, setProduction] = useState([]);
@@ -67,14 +69,15 @@ const Client = () => {
   });
 
   return (
-    <div>
-      <header>
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h1>Nome da página </h1>
         <Link className="back-link" to="/login">
           <FiLogIn size={16} color="darkorange" />
           Login
         </Link>
-      </header>
-      <div className="content">
+      </div>
+      <div className={styles.content}>
         <form onSubmit={handleShowHoney}>
           <input
             placeholder="ID do produto"
@@ -85,13 +88,12 @@ const Client = () => {
             Search
           </button>
         </form>
-        {search && (
-          <div>
-            <SearchHoney product={product} production={production} />
-          </div>
-        )}
       </div>
+      {search && (
+        <div>
+          <SearchHoney product={product} production={production} />
+        </div>
+      )}
     </div>
   );
 };
-export default Client;

@@ -6,7 +6,7 @@ const privateKey =
 //const blockchainUrl = "ws://3.210.145.39:8546";
 const blockchainUrl = "ws://192.168.1.100:7545";
 
-const useConnect = (abi, ContractAddress) => {
+const useConnect = (abi, contractAddress) => {
   const web3 = new Web3(blockchainUrl);
   //var web3 = new Web3(new Web3.providers.WebsocketProvider(blockchainUrl));
   const { address } = web3.eth.accounts.privateKeyToAccount(privateKey);
@@ -15,11 +15,11 @@ const useConnect = (abi, ContractAddress) => {
   const networkId = async () => {
     return await web3.eth.net.getId();
   };
+
   const contract = useMemo(() => {
-    networkId();
-    //if (!contract) return;
-    return new web3.eth.Contract(abi, ContractAddress);
-  }, [networkId]);
+    //if (contract) return;
+    return new web3.eth.Contract(abi, contractAddress);
+  }, [web3.eth.Contract, abi, contractAddress]);
   console.log("Contrato via useConnect ", contract);
   return { address, contract };
 };
