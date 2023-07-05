@@ -30,8 +30,6 @@ contract Authentication {
         User memory _user,
         string memory _password
     ) public returns (bool) {
-        // Registrar o produtor
-        //string memory _id = generateId(_addr, _name, password, _date);
         bytes32 password = keccak256(abi.encodePacked(_user.email, _password));
         uint hashDigits = 8;
         uint hashModulus = 10 ** hashDigits;

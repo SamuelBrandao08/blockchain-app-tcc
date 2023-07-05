@@ -58,8 +58,17 @@ contract UpdateTr {
         if (transactions[_unit].length == 0) {
             previousTx = _unit;
         } else {
-            previousTx = transactions[_unit][transactions[_unit].length - 1]
-                .currentTx;
+            Transaction memory tr = transactions[_unit][
+                transactions[_unit].length - 1
+            ];
+            require(
+                keccak256(abi.encodePacked(_receiver)) ==
+                    keccak256(abi.encodePacked(tr.receiver)) ||
+                    keccak256(abi.encodePacked(_sender)) ==
+                    keccak256(abi.encodePacked(tr.receiver)),
+                "Transacao Inconcistente!"
+            );
+            previousTx = tr.currentTx;
         }
         transactions[_unit].push(
             Transaction(

@@ -89,33 +89,36 @@ function Drum() {
 
   const handleNewDrum = async (e) => {
     e.preventDefault();
-    try {
-      if (!contract) return;
-      const datetime = format(new Date(startDate), "dd/MM/yyyy-HH:mm:ss");
-      console.log("Lote", selectedBatch);
-      eventsListen(userId, setResponse);
-      const { transactionHash } = await contract.methods
-        .newDrum(
-          userId,
-          selectedBatch,
-          code,
-          weight,
-          packing,
-          flowering,
-          datetime,
-          hivesId.split(",")
-        )
-        .send({
-          from: address,
-          gas: "800000",
-        });
-      //setResponse([...response, transactionHash]);
-      setResponse((state) => [...state, transactionHash]);
+    for (let i = 0; i < 20; i++) {
+      try {
+        if (!contract) return;
+        const datetime = format(new Date(startDate), "dd/MM/yyyy-HH:mm:ss");
+        console.log("Lote", selectedBatch);
 
-      alert("Success!");
-    } catch (error) {
-      console.log(error);
-      alert("Erro na operação");
+        eventsListen(userId, setResponse);
+        const { transactionHash } = await contract.methods
+          .newDrum(
+            userId,
+            selectedBatch,
+            code,
+            weight,
+            packing,
+            flowering,
+            datetime,
+            hivesId.split(",")
+          )
+          .send({
+            from: address,
+            gas: "800000",
+          });
+        //setResponse([...response, transactionHash]);
+        setResponse((state) => [...state, transactionHash]);
+
+        alert("Success!");
+      } catch (error) {
+        console.log(error);
+        alert("Erro na operação");
+      }
     }
   };
   console.log("Retorno", response);

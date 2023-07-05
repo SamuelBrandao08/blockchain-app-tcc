@@ -3,6 +3,9 @@ const fs = require("fs");
 const mnemonicPhrase = fs.readFileSync(".secret").toString().trim();
 
 module.exports = {
+  dashboard: {
+    port: 24012,
+  },
   networks: {
     // development: {
     //   host: "127.0.0.1",
