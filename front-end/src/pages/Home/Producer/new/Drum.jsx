@@ -42,7 +42,7 @@ export function Drum() {
 
   const [drumsId, setDrumsId] = useState("");
   const [response, setResponse] = useState([]);
-  console.log(startDate.toISOString());
+
   const generateBatch = async (e) => {
     e.preventDefault();
     e.stopPropagation();

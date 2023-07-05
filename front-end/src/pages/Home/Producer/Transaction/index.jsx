@@ -12,6 +12,7 @@ import { format } from "date-fns";
 import Select from "react-select";
 import useUpdateTr from "../../../../hooks/useUpdateTr";
 import useConnect from "../../../../hooks/useConnect";
+import { useAuth } from "../../../../contexts/AuthContext";
 // import { Container } from './styles';
 
 const options = [
@@ -20,9 +21,9 @@ const options = [
 ];
 
 function ProducerTransaction() {
-  const userId = localStorage.getItem("userId");
+  const { user } = useAuth()
 
-  const [sender, setSender] = useState(userId);
+  const [sender, setSender] = useState(user.id);
   const [receiver, setReceiver] = useState("87060241");
   const [unit, setUnit] = useState("798517751");
   const [startDate, setStartDate] = useState(new Date());
@@ -37,17 +38,17 @@ function ProducerTransaction() {
 
   const dispatcher = async (e) => {
     e.preventDefault();
-    const datetime = format(new Date(startDate), "dd/MM/yyyy-HH:mm");
+    const datetime = startDate.toISOString();
     try {
       if (!prc) return;
       prc.contract.methods
-        .dispatcher(userId, receiver, unit, datetime)
+        .dispatcher(user.id, receiver, unit, datetime)
         .send({
           from: prc.address,
           gas: "800000",
         })
         .then(({ transactionHash }) => {
-          updateTr(transactionHash, userId, receiver, unit, datetime);
+          updateTr(transactionHash, user.id, receiver, unit, datetime);
         });
     } catch (error) {
       console.log(error);

@@ -11,7 +11,7 @@ import { useWeb3Context } from "web3-react";
 import { FiArrowLeft } from "react-icons/fi";
 import HoneyProduction from "./Componentes/Production/HoneyProduction";
 import DispatchedProducts from "./Componentes/Dispatched/DispatchedProducts";
-import ProducerTracing from "./Componentes/ProducerTracing";
+import ProducerTracing from "./Componentes/ProducerTracing/ProducerTracing";
 import useWallet from "../../../hooks/useConnect";
 import useConnect from "../../../hooks/useConnect";
 import { DataGrid as MuiDataGrid, ptBR } from "@mui/x-data-grid";
@@ -96,7 +96,7 @@ function HomeProducer({ userId, userName }) {
   const [palletId, setPalletId] = useState([]);
   const [pallet, setPallet] = useState({});
 
-  const [dispatcheds, setDispatcheds] = useState([]);
+  const [dispatched, setDispatched] = useState([]);
   const [product, setProduct] = useState([]);
 
   const [batchs, setBatchs] = useState([]);
@@ -134,7 +134,7 @@ function HomeProducer({ userId, userName }) {
   const listDispatched = async () => {
     if (contract !== null) {
       const response = await contract.methods.listDispatched(userId).call();
-      setDispatcheds(response);
+      setDispatched(response);
     }
   };
 
@@ -167,7 +167,7 @@ function HomeProducer({ userId, userName }) {
           placeholder="Selecione o lote"
         />
       </div>
-      <div style={{ width: '100%', height: '80%' }}>
+      <div style={{ width: '100%', height: '30%' }}>
         <DataGrid
           columns={columns}
           rows={drums}
@@ -216,8 +216,8 @@ function HomeProducer({ userId, userName }) {
       </div>
       <div>
         <DispatchedProducts
-          dispatcheds={dispatcheds}
-          setDispatcheds={setDispatcheds}
+          dispatched={dispatched}
+          setDispatched={setDispatched}
         />
       </div>
       <div>

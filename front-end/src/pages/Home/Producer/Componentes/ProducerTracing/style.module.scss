@@ -1,0 +1,19 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.header {
+  input {
+    max-width: 300px;
+    margin-right: 16px;
+    border-radius: 4px;
+  }
+
+  button {
+    width: max-content;
+    padding: 8px 16px;
+    border-radius: 4px;
+  }
+}
