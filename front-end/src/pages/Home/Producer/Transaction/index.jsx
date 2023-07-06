@@ -7,14 +7,18 @@ import TUC from "../../../../abi/UpdateTr.json";
 import { Production, UpdateTr } from "../../../../abi/address.json";
 
 import useContract from "../../../../hooks/useContract";
-import DatePicker from "react-datepicker";
+import DatePicker, { registerLocale } from "react-datepicker";
+import { ptBR } from "date-fns/locale";
 import { format } from "date-fns";
 import Select from "react-select";
 import useUpdateTr from "../../../../hooks/useUpdateTr";
 import useConnect from "../../../../hooks/useConnect";
 import { useAuth } from "../../../../contexts/AuthContext";
-// import { Container } from './styles';
+import { Header } from "../../../../components/Header";
 
+import styles from "./style.module.scss";
+
+registerLocale("ptBR", ptBR);
 const options = [
   { label: "unidade", value: 0 },
   { label: "palete", value: 2 },
@@ -57,54 +61,71 @@ function ProducerTransaction() {
   };
 
   return (
-    <div>
-      <div className="profile-content">
-        <h2>Informações de envio</h2>
-        <form onSubmit={dispatcher}>
-          <label htmlFor="">Produtor</label>
-          <input
-            placeholder="Produtor"
-            value={sender}
-            onChange={(e) => setSender(e.target.value)}
-          />
-          <label htmlFor="">Destinatário</label>
-          <input
-            placeholder="Tranportador"
-            value={receiver}
-            onChange={(e) => setReceiver(e.target.value)}
-          />
-          <label htmlFor="">ID da unidade</label>
-          <input
-            placeholder="ID da unidade"
-            value={unit}
-            onChange={(e) => setUnit(e.target.value)}
-          />
-          <label htmlFor="">Data de envio</label>
-          <DatePicker
-            selected={startDate}
-            onChange={(date) => setStartDate(date)}
-            showTimeSelect
-            dateFormat="dd/MM/yyyy-HH:mm:ss"
-          />
-          <label htmlFor="">Especificação da Unidade</label>
-          <Select
-            defaultValue={unitType}
-            onChange={(e) => setUnitType(e.value)}
-            options={options}
-            placeholder="Especificação da Unidade"
-          />
+    <div className={styles.container}>
+      <Header />
+      <div className={styles.backButton}>
+        <Link className="back-link" to="/home">
+          <FiArrowLeft size={16} color="#e02041" />
+          Voltar
+        </Link>
+      </div>
+      <main className={styles.content}>
+        <div className={styles.titleForm}>
+          <h2>Informações de envio</h2>
+        </div>
+        <form className={styles.form} onSubmit={dispatcher}>
+          <div className={styles.inputWrapper}>
+            <label htmlFor="">Produtor</label>
+            <input
+              placeholder="Produtor"
+              value={sender}
+              onChange={(e) => setSender(e.target.value)}
+            />
+          </div>
+          <div className={styles.inputWrapper}>
+            <label htmlFor="">Destinatário</label>
+            <input
+              placeholder="Tranportador"
+              value={receiver}
+              onChange={(e) => setReceiver(e.target.value)}
+            />
+          </div>
+          <div className={styles.inputWrapper}>
+            <label htmlFor="">ID da unidade</label>
+            <input
+              placeholder="ID da unidade"
+              value={unit}
+              onChange={(e) => setUnit(e.target.value)}
+            />
+          </div>
+          <div className={styles.inputWrapper}>
+            <label htmlFor="">Data de envio</label>
+            <DatePicker
+              timeCaption="Horas"
+              locale={ptBR}
+              selected={startDate}
+              onChange={(date) => setStartDate(date)}
+              showTimeSelect
+              dateFormat="dd/MM/yyyy-HH:mm:ss"
+              className={styles.datePicker}
+            />
+          </div>
+          <div className={styles.inputWrapper}>
+            <label htmlFor="">Especificação da Unidade</label>
+            <Select
+              className={styles.select}
+              defaultValue={unitType}
+              onChange={(e) => setUnitType(e.value)}
+              options={options}
+              placeholder="Especificação da Unidade"
+            />
+          </div>
 
           <button type="submit" className="button">
             Despachar
           </button>
         </form>
-      </div>
-      <div>
-        <Link className="back-link" to="/home">
-          <FiArrowLeft size={16} color="#e02041" />
-          Voltar para home
-        </Link>
-      </div>
+      </main>
     </div>
   );
 }
