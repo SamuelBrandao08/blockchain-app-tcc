@@ -174,7 +174,7 @@ export function Drum() {
           <TabPanel>
             <form className={styles.form} onSubmit={handleNewDrum}>
               <div className={styles.inputWrapper}>
-                <label htmlFor="">Senha</label>
+                <label htmlFor="">Codigo</label>
                 <input
                   placeholder="Codigo do produto"
                   value={code}
@@ -182,7 +182,7 @@ export function Drum() {
                 />
               </div>
               <div className={styles.inputWrapper}>
-                <label htmlFor="">Senha</label>
+                <label htmlFor="">Peso</label>
                 <input
                   placeholder="Peso liquido"
                   name="weight"
@@ -191,15 +191,15 @@ export function Drum() {
                 />
               </div>
               <div className={styles.inputWrapper}>
-                <label htmlFor="">Senha</label>
+                <label htmlFor="">Recipiente</label>
                 <input
-                  placeholder="Embalagem"
+                  placeholder="Recipiente"
                   value={packing}
                   onChange={(e) => setPacking(e.target.value)}
                 />
               </div>
               <div className={styles.inputWrapper}>
-                <label htmlFor="">Senha</label>
+                <label htmlFor="">Florada</label>
                 <input
                   placeholder="Florada"
                   value={flowering}
@@ -207,7 +207,7 @@ export function Drum() {
                 />
               </div>
               <div className={styles.inputWrapper}>
-                <label htmlFor="">Senha</label>
+                <label htmlFor="">Fabricação</label>
                 <DatePicker
                   timeCaption="Horas"
                   locale={ptBR}
@@ -218,20 +218,20 @@ export function Drum() {
                   className={styles.datePicker}
                 />
               </div>
-              <div className={styles.inputWrapper}>
-                <label htmlFor="">Senha</label>
+              {/* <div className={styles.inputWrapper}>
+                <label htmlFor="">Colheita</label>
                 <input
                   type="text"
-                  placeholder="Id das colmeias"
+                  placeholder="ID da colheita"
                   value={hivesId}
                   onChange={(e) => setHivesId(e.target.value)}
                 />
-              </div>
+              </div> */}
               <div
                 className={`${styles.inputWrapper} ${styles.inputWrapperSelect}`}
               >
                 <div>
-                  <label htmlFor="select">Senha</label>
+                  <label htmlFor="select">Lote</label>
                   <Select
                     id="select"
                     className={styles.select}
@@ -254,7 +254,7 @@ export function Drum() {
           <TabPanel>
             <form className={styles.form} onSubmit={handleNewPallet}>
               <div className={styles.inputWrapper}>
-                <label htmlFor="">Senha</label>
+                <label htmlFor="">codigo</label>
                 <input
                   placeholder="Lote do Produto"
                   value={selectedBatch}
@@ -262,7 +262,7 @@ export function Drum() {
                 />
               </div>
               <div className={styles.inputWrapper}>
-                <label htmlFor="">Senha</label>
+                <label htmlFor="">IDs das unidades</label>
                 <input
                   placeholder="Unidades que compõem o palete"
                   value={drumsId}

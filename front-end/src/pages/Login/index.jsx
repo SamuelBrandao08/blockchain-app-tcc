@@ -8,7 +8,7 @@ import styles from "./style.module.scss";
 
 export default function Login() {
   const { signIn } = useAuth();
-  const [login, setLogin] = useState("samuelbrandao@email.com");
+  const [login, setLogin] = useState("samuel@email.com");
   const [password, setPassword] = useState("alunoufc");
   const history = useHistory("");
 

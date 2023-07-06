@@ -12,37 +12,39 @@ import useConnect from "../../../hooks/useConnect";
 
 // import { Container } from './styles';
 
-function HomeProcessor() {
+function HomeProcessor({ user }) {
+  console.log(user.name, user.id);
   const [feedstock, setFeedstock] = useState([]);
   const [honeys, setHoneys] = useState([]);
   const [dispatcheds, setDispatcheds] = useState([]);
 
   //const contract = useContract(abi, Processing);
   const { address, contract } = useConnect(abi, Processing);
-  const userId = localStorage.getItem("userId");
-  console.log("user", userId);
 
   useEffect(() => {
     listFeedstock();
     listHoneys();
     listDispatched();
-  }, [contract]);
+  }, []);
   console.log("carregamento", feedstock);
   async function listFeedstock() {
     if (!contract) return;
-    const response = await contract.methods.listFeedstock(userId).call();
+    const response = await contract.methods.listFeedstock(user.id).call();
+    if (response == 0) return;
     setFeedstock(response);
   }
   console.log("producao", honeys);
   async function listHoneys() {
     if (!contract) return;
-    const response = await contract.methods.listHoneys(userId).call();
+    const response = await contract.methods.listHoneys(user.id).call();
+    if (response == 0) return;
     setHoneys(response);
   }
 
   async function listDispatched() {
     if (!contract) return;
-    const response = await contract.methods.listDispatched(userId).call();
+    const response = await contract.methods.listDispatched(user.id).call();
+    if (response == 0) return;
     setDispatcheds(response);
   }
 

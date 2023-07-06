@@ -16,30 +16,37 @@ import { useAuth } from "./contexts/AuthContext";
 import { Redirect } from "react-router-dom/cjs/react-router-dom.min";
 
 export default function Routes() {
-  const { user } = useAuth()
+  const { user } = useAuth();
 
   return (
     <BrowserRouter>
       <Switch>
-        <Route render={() => user ? (
-          <>
-            <Route path="/" exact component={Home} />
-            <Route path="/home" component={Home} />
-            <Route path="/producer/transaction" component={ProducerTransaction} />
-            <Route path="/producer/new/drum" component={Drum} />
-            <Route path="/processor/receiver" component={Receiver} />
-            <Route path="/processor/new/honey" component={Honey} />
-            <Route path="/processor/dispatcher" component={Dispatcher} />
-            <Route render={() => <Redirect to="/home" />} />
-          </>
-        ) : (
-          <>
-            {/* <Route path="/" exact component={Client} /> */}
-            <Route path="/login" component={Login} />
-            <Route path="/register" component={Register} />
-            <Route render={() => <Redirect to="/login" />} />
-          </>
-        )} />
+        <Route
+          render={() =>
+            user ? (
+              <>
+                <Route path="/" exact component={Home} />
+                <Route path="/home" component={Home} />
+                <Route
+                  path="/producer/transaction"
+                  component={ProducerTransaction}
+                />
+                <Route path="/producer/new/drum" component={Drum} />
+                <Route path="/processor/new/honey" component={Honey} />
+                <Route path="/processor/receiver" component={Receiver} />
+                <Route path="/processor/dispatcher" component={Dispatcher} />
+                <Route render={() => <Redirect to="/home" />} />
+              </>
+            ) : (
+              <>
+                {/* <Route path="/" exact component={Client} /> */}
+                <Route path="/login" component={Login} />
+                <Route path="/register" component={Register} />
+                <Route render={() => <Redirect to="/login" />} />
+              </>
+            )
+          }
+        />
       </Switch>
     </BrowserRouter>
   );

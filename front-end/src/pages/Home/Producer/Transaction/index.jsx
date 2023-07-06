@@ -25,7 +25,7 @@ const options = [
 ];
 
 function ProducerTransaction() {
-  const { user } = useAuth()
+  const { user } = useAuth();
 
   const [sender, setSender] = useState(user.id);
   const [receiver, setReceiver] = useState("87060241");
@@ -74,14 +74,14 @@ function ProducerTransaction() {
           <h2>Informações de envio</h2>
         </div>
         <form className={styles.form} onSubmit={dispatcher}>
-          <div className={styles.inputWrapper}>
+          {/* <div className={styles.inputWrapper}>
             <label htmlFor="">Produtor</label>
             <input
               placeholder="Produtor"
               value={sender}
               onChange={(e) => setSender(e.target.value)}
             />
-          </div>
+          </div> */}
           <div className={styles.inputWrapper}>
             <label htmlFor="">Destinatário</label>
             <input

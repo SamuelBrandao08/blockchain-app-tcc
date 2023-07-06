@@ -20,73 +20,74 @@ import Select from "react-select";
 import { format } from "date-fns";
 
 const DataGrid = styled(MuiDataGrid)`
-  .MuiDataGrid-columnHeaders{
+  .MuiDataGrid-columnHeaders {
     min-height: 35px !important;
-    background-color: #E0E0E0;
+    background-color: #e0e0e0;
   }
-  .MuiDataGrid-columnSeparator--sideRight{
+  .MuiDataGrid-columnSeparator--sideRight {
     display: none !important;
   }
 
-  .MuiDataGrid-footerContainer{
+  .MuiDataGrid-footerContainer {
     min-height: 32px;
     height: 32px;
-    background-color: #F5F5F5;
+    background-color: #f5f5f5;
   }
 `;
 
 const columns = [
   {
-    field: 'code',
-    headerName: 'Código',
+    field: "code",
+    headerName: "Código",
     sortable: false,
   },
   {
-    field: 'batch',
-    headerName: 'Lote',
+    field: "batch",
+    headerName: "Lote",
     sortable: false,
   },
   {
-    field: 'packing',
-    headerName: 'Recipiente',
+    field: "packing",
+    headerName: "Recipiente",
     sortable: false,
     flex: 1,
   },
   {
-    field: 'flowering',
-    headerName: 'Florada',
-    sortable: false,
-    flex: 1
-  },
-  {
-    field: 'date',
-    headerName: 'Fabricação',
+    field: "flowering",
+    headerName: "Florada",
     sortable: false,
     flex: 1,
-    valueFormatter: ({ value }) => format(new Date(value), "dd/mm/yyyy 'às' HH:mm")
   },
   {
-    field: 'productorId',
-    headerName: 'Produtor',
+    field: "date",
+    headerName: "Fabricação",
+    sortable: false,
+    flex: 1,
+    valueFormatter: ({ value }) =>
+      format(new Date(value), "dd/mm/yyyy 'às' HH:mm"),
+  },
+  {
+    field: "productorId",
+    headerName: "Produtor",
     sortable: false,
   },
   {
-    field: 'weight',
-    headerName: 'Peso',
+    field: "weight",
+    headerName: "Peso",
     sortable: false,
-    valueFormatter: ({ value }) => `${value} kg`
+    valueFormatter: ({ value }) => `${value} kg`,
   },
-  {
-    field: 'hivesId',
-    headerName: 'Colmeias',
-    sortable: false,
-    align: 'right',
-    width: 80
-  },
-]
+  // {
+  //   field: 'hivesId',
+  //   headerName: 'Colmeias',
+  //   sortable: false,
+  //   align: 'right',
+  //   width: 80
+  // },
+];
 
-function HomeProducer({ userId, userName }) {
-  //console.log(userName, userId);
+function HomeProducer({ user }) {
+  console.log(user);
   const [item, setItem] = useState("");
 
   const [drumId, setDrumId] = useState("");
@@ -113,7 +114,7 @@ function HomeProducer({ userId, userName }) {
 
   const getBatchs = async () => {
     if (contract !== null) {
-      const response = await contract.methods.getDrumBatchs(userId).call();
+      const response = await contract.methods.getDrumBatchs(user.id).call();
       if (response == 0) return;
       const options = response.map((i) => ({
         label: i,
@@ -133,7 +134,7 @@ function HomeProducer({ userId, userName }) {
 
   const listDispatched = async () => {
     if (contract !== null) {
-      const response = await contract.methods.listDispatched(userId).call();
+      const response = await contract.methods.listDispatched(user.id).call();
       setDispatched(response);
     }
   };
@@ -167,13 +168,11 @@ function HomeProducer({ userId, userName }) {
           placeholder="Selecione o lote"
         />
       </div>
-      <div style={{ width: '100%', height: '30%' }}>
+      <div style={{ width: "100%", height: "30%" }}>
         <DataGrid
           columns={columns}
           rows={drums}
-          localeText={
-            ptBR.components.MuiDataGrid.defaultProps.localeText
-          }
+          localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
           hideFooter
           columnHeaderHeight={40}
           rowHeight={50}
@@ -183,10 +182,10 @@ function HomeProducer({ userId, userName }) {
           disableRowSelectionOnClick
           disableSelectionOnClick
           loading={false}
-        // components={{
-        //   Pagination,
-        //   Cell: isFetching ? CustomSkeleton : GridCell,
-        // }}
+          // components={{
+          //   Pagination,
+          //   Cell: isFetching ? CustomSkeleton : GridCell,
+          // }}
         />
         {/* <HoneyProduction
           drums={drums}

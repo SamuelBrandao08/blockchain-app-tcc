@@ -61,7 +61,7 @@ export function Register() {
 
       //api.post("/user", { id: id, address: context.account });
 
-      console.log("Retorno: ", response.status);
+      console.log("Retorno: ", response);
       if (response.status) {
         alert("Usuário cadastrado!");
       }

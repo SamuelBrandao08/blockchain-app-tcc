@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import useContract from "../../../hooks/useContract";
 import Select from "react-select";
 import { format } from "date-fns";
@@ -16,8 +16,75 @@ const options = [
   { label: "palete", value: 2 },
 ];
 
-const HomeDistributor = () => {
-  const userId = localStorage.getItem("userId");
+const DataGrid = styled(MuiDataGrid)`
+  .MuiDataGrid-columnHeaders {
+    min-height: 35px !important;
+    background-color: #e0e0e0;
+  }
+  .MuiDataGrid-columnSeparator--sideRight {
+    display: none !important;
+  }
+
+  .MuiDataGrid-footerContainer {
+    min-height: 32px;
+    height: 32px;
+    background-color: #f5f5f5;
+  }
+`;
+
+const columns = [
+  {
+    field: "code",
+    headerName: "Código",
+    sortable: false,
+  },
+  {
+    field: "batch",
+    headerName: "Lote",
+    sortable: false,
+  },
+  {
+    field: "packing",
+    headerName: "Recipiente",
+    sortable: false,
+    flex: 1,
+  },
+  {
+    field: "flowering",
+    headerName: "Florada",
+    sortable: false,
+    flex: 1,
+  },
+  {
+    field: "date",
+    headerName: "Fabricação",
+    sortable: false,
+    flex: 1,
+    valueFormatter: ({ value }) =>
+      format(new Date(value), "dd/mm/yyyy 'às' HH:mm"),
+  },
+  {
+    field: "productorId",
+    headerName: "Produtor",
+    sortable: false,
+  },
+  {
+    field: "weight",
+    headerName: "Peso",
+    sortable: false,
+    valueFormatter: ({ value }) => `${value} kg`,
+  },
+  // {
+  //   field: 'hivesId',
+  //   headerName: 'Colmeias',
+  //   sortable: false,
+  //   align: 'right',
+  //   width: 80
+  // },
+];
+
+const HomeDistributor = ({ user }) => {
+  console.log(user.name, user.id);
 
   const [supplier, setSupplier] = useState("Seu Jose");
   const [unit, setUnit] = useState("6e6f9ddb20/05/2023-16:47:44");
@@ -29,8 +96,10 @@ const HomeDistributor = () => {
 
   const [receivedId, setReceiverId] = useState("");
   const [unitReceived, setUnitReceived] = useState([]);
+  const [receiveds, setReceiveds] = useState([]);
   const [dispatchedId, setDispatchedId] = useState("");
   const [unitDispatched, setUnitDispatched] = useState([]);
+  const [dispatcheds, setDispatcheds] = useState([]);
 
   const context = useWeb3Context();
   // const prc = useContract(DBC.abi, Distributor);
@@ -40,16 +109,21 @@ const HomeDistributor = () => {
 
   const updateTr = useUpdateTr(tuc);
 
+  useEffect(() => {
+    listReceved();
+    listDispatched();
+  }, []);
+
   async function handleReceiver(e) {
     e.preventDefault();
     try {
       if (!dbc | !tuc) return;
       const date = format(new Date(startDate), "dd/MM/yyyy-HH:mm:ss");
       dbc.contract.methods
-        .receiver(userId, supplier, unit, date, local, unitType)
+        .receiver(user.id, supplier, unit, date, local, unitType)
         .send({ from: dbc.address, gas: "800000" })
         .then(({ transactionHash }) => {
-          updateTr(transactionHash, supplier, userId, unit, date);
+          updateTr(transactionHash, supplier, user.id, unit, date);
         });
       alert("Success!");
     } catch (error) {
@@ -57,18 +131,15 @@ const HomeDistributor = () => {
       alert("Error na operação");
     }
   }
-  console.log("unidade recebida", unitReceived);
-  async function handleGetReceived(e) {
+
+  async function listReceved(e) {
     e.preventDefault();
-    try {
-      if (!dbc) return;
-      const response = await dbc.contract.methods
-        .getReceivedUnits(receivedId)
-        .call();
-      setUnitReceived(response);
-    } catch (error) {
-      alert("Erro na operação");
-    }
+    if (!dbc) return;
+    const response = await dbc.contract.methods
+      .listReceivedUnits(user.id)
+      .call();
+    if (response == 0) return;
+    setReceiveds(response);
   }
 
   async function handleDispatcher(e) {
@@ -77,10 +148,10 @@ const HomeDistributor = () => {
       if (!dbc | !tuc) return;
       const date = format(new Date(startDate), "dd/MM/yyyy-HH:mm:ss");
       dbc.contract.methods
-        .dispatcher(userId, receiver, unit, date, local, unitType)
+        .dispatcher(user.id, receiver, unit, date, local, unitType)
         .send({ from: dbc.address, gas: "800000" })
         .then(({ transactionHash }) => {
-          updateTr(transactionHash, userId, receiver, unit, date);
+          updateTr(transactionHash, user.id, receiver, unit, date);
         });
     } catch (error) {
       console.log(error);
@@ -88,93 +159,85 @@ const HomeDistributor = () => {
     }
   }
 
-  async function handleGetDispatched(e) {
+  async function listDispatched(e) {
     e.preventDefault();
-    try {
-      if (!dbc) return;
-      const response = await dbc.contract.methods
-        .getDispatchedUnits(dispatchedId)
-        .call();
-      setUnitDispatched(response);
-    } catch (error) {
-      alert("Erro na operação");
-    }
+    if (!dbc) return;
+    const response = await dbc.contract.methods
+      .listDispatchedUnits(user.id)
+      .call();
+    if (response == 0) return;
+    setDispatcheds(response);
   }
 
   return (
     <div>
       <div>
-        <div>
-          <header>
-            <h2>Registrar Recebimento de Produtos</h2>
-          </header>
-          <main>
-            <form onSubmit={handleReceiver}>
-              <label htmlFor="">Fornecedor</label>
-              <input
-                type="text"
-                placeholder=""
-                value={supplier}
-                onChange={(e) => setSupplier(e.target.value)}
-              />
-              <label htmlFor="">ID da nidade</label>
-              <input
-                type="text"
-                placeholder=""
-                value={unit}
-                onChange={(e) => setUnit(e.target.value)}
-              />
-              <label htmlFor="">Data da coleta</label>
-              <DatePicker
-                selected={startDate}
-                onChange={(date) => setStartDate(date)}
-                showTimeSelected
-                dateFromat="dd/MM/yyyy"
-              />
-              <label htmlFor="">Local da coleta</label>
-              <input
-                type="text"
-                placeholder=""
-                value={local}
-                onChange={(e) => setLocal(e.target.value)}
-              />
-              <label htmlFor="">Tipo da Unidade</label>
-              <Select
-                valueDefault={unitType}
-                onChange={(e) => setUnitType(e.value)}
-                options={options}
-                placeholder=""
-              />
-              <button type="submit">Registrar</button>
-            </form>
-          </main>
-        </div>
-        <div>
-          <header>
-            <h3>Pesquisar Unidade Recebida</h3>
-            <form onSubmit={handleGetReceived}>
-              <input
-                type="text"
-                placeholder="ID da unidade"
-                value={receivedId}
-                onChange={(e) => setReceiverId(e.target.value)}
-              />
-              <button type="submit">Search</button>
-            </form>
-          </header>
-          <main>
-            {unitReceived.length !== 0 && (
-              <ul>
-                {unitReceived.unitType}
-                <li>ID: {unitReceived.id}</li>
-                <li>Fornecedor: {unitReceived.supplierId}</li>
-                <li>Data: {unitReceived.dateTime}</li>
-                <li>Local: {unitReceived.local}</li>
-              </ul>
-            )}
-          </main>
-        </div>
+        <header>
+          <h2>Registrar Recebimento de Produtos</h2>
+        </header>
+        <main>
+          <form onSubmit={handleReceiver}>
+            <label htmlFor="">Fornecedor</label>
+            <input
+              type="text"
+              placeholder=""
+              value={supplier}
+              onChange={(e) => setSupplier(e.target.value)}
+            />
+            <label htmlFor="">ID da nidade</label>
+            <input
+              type="text"
+              placeholder=""
+              value={unit}
+              onChange={(e) => setUnit(e.target.value)}
+            />
+            <label htmlFor="">Data da coleta</label>
+            <DatePicker
+              selected={startDate}
+              onChange={(date) => setStartDate(date)}
+              showTimeSelected
+              dateFromat="dd/MM/yyyy"
+            />
+            <label htmlFor="">Local da coleta</label>
+            <input
+              type="text"
+              placeholder=""
+              value={local}
+              onChange={(e) => setLocal(e.target.value)}
+            />
+            <label htmlFor="">Tipo da Unidade</label>
+            <Select
+              valueDefault={unitType}
+              onChange={(e) => setUnitType(e.value)}
+              options={options}
+              placeholder=""
+            />
+            <button type="submit">Registrar</button>
+          </form>
+        </main>
       </div>
+
+      <div style={{ width: "100%", height: "30%" }}>
+        <DataGrid
+          columns={columns}
+          rows={drums}
+          localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
+          hideFooter
+          columnHeaderHeight={40}
+          rowHeight={50}
+          hideFooterSelectedRowCount={false}
+          disableColumnMenu={true}
+          showColumnRightBorder={false}
+          disableRowSelectionOnClick
+          disableSelectionOnClick
+          loading={false}
+          // components={{
+          //   Pagination,
+          //   Cell: isFetching ? CustomSkeleton : GridCell,
+          // }}
+        />
+      </div>
+
       <div>
         <div>
           <header>
@@ -221,31 +284,25 @@ const HomeDistributor = () => {
             </form>
           </main>
         </div>
-
-        <div>
-          <header>
-            <h3>Pesquisar Unidade Despachada</h3>
-            <form onSubmit={handleGetDispatched}>
-              <input
-                type="text"
-                placeholder="ID da unidade"
-                value={dispatchedId}
-                onChange={(e) => setDispatchedId(e.target.value)}
-              />
-              <button type="submit">Search</button>
-            </form>
-          </header>
-          <main>
-            {unitDispatched.length !== 0 && (
-              <ul>
-                {unitDispatched.unitType}
-                <li>ID: {unitDispatched.id}</li>
-                <li>Fornecedor: {unitDispatched.receiverId}</li>
-                <li>Data: {unitDispatched.date}</li>
-                <li>Local: {unitDispatched.local}</li>
-              </ul>
-            )}
-          </main>
+        <div style={{ width: "100%", height: "30%" }}>
+          <DataGrid
+            columns={columns}
+            rows={drums}
+            localeText={ptBR.components.MuiDataGrid.defaultProps.localeText}
+            hideFooter
+            columnHeaderHeight={40}
+            rowHeight={50}
+            hideFooterSelectedRowCount={false}
+            disableColumnMenu={true}
+            showColumnRightBorder={false}
+            disableRowSelectionOnClick
+            disableSelectionOnClick
+            loading={false}
+            // components={{
+            //   Pagination,
+            //   Cell: isFetching ? CustomSkeleton : GridCell,
+            // }}
+          />
         </div>
       </div>
     </div>

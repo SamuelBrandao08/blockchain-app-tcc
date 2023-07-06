@@ -21,7 +21,8 @@ const options = [
   { label: "palete", value: 2 },
 ];
 
-function HomeMerchant() {
+function HomeMerchant({ user }) {
+  console.log(user.name, user.id);
   const [previousTx, setPreviousTx] = useState("");
   const [sender, setSender] = useState("");
   const [unit, setUnit] = useState("");
@@ -38,7 +39,6 @@ function HomeMerchant() {
   const tuc = useConnect(TUC.abi, UpdateTr);
 
   const updateTr = useUpdateTr(tuc);
-  const userId = localStorage.getItem("userId");
 
   async function handleReceiver(e) {
     e.preventDefault();
@@ -46,10 +46,10 @@ function HomeMerchant() {
     try {
       if (!mrc | !tuc) return;
       mrc.contract.methods
-        .receiver(sender, userId, unit, subUnits.split(","), date, unitType)
+        .receiver(sender, user.id, unit, subUnits.split(","), date, unitType)
         .send({ from: mrc.address, gas: "800000" })
         .then(({ transactionHash }) => {
-          updateTr(transactionHash, supply, userId, unit, date);
+          updateTr(transactionHash, supply, user.id, unit, date);
         });
       alert("Success!");
     } catch (error) {
@@ -65,7 +65,7 @@ function HomeMerchant() {
   async function listSupply() {
     if (!mrc) return;
     const response = await mrc.contract.methods
-      .listReceivedUnits(userId)
+      .listReceivedUnits(user.id)
       .call();
     setSupply(response);
   }

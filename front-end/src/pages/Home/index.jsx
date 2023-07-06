@@ -16,18 +16,20 @@ import { useAuth } from "../../contexts/AuthContext";
 import { Header } from "../../components/Header";
 
 export default function Home() {
-  const { user } = useAuth()
+  const { user } = useAuth();
 
   return (
     <div className={styles.container}>
       <Header />
 
-      {user.role === profileConstants.PRODUCER && (
-        <HomeProducer userId={user.id} userName={user.name} />
+      {user.role === profileConstants.PRODUCER && <HomeProducer user={user} />}
+      {user.role === profileConstants.PROCESSOR && (
+        <HomeProcessor user={user} />
       )}
-      {user.role === profileConstants.PROCESSOR && <HomeProcessor />}
-      {user.role === profileConstants.DISTRIBUTOR && <HomeDistributor />}
-      {user.role === profileConstants.MERCHANT && <HomeMerchant />}
+      {user.role === profileConstants.DISTRIBUTOR && (
+        <HomeDistributor user={user} />
+      )}
+      {user.role === profileConstants.MERCHANT && <HomeMerchant user={user} />}
     </div>
   );
 }
