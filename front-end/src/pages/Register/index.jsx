@@ -13,7 +13,7 @@ import useConnect from "../../hooks/useConnect";
 
 import styles from "./style.module.scss";
 
-var crypto = require("crypto");
+//var crypto = require("crypto");
 
 const options = Object.values(profileConstants).map((profile) => ({
   label: profile.charAt(0).toUpperCase() + profile.slice(1),
@@ -83,12 +83,11 @@ export function Register() {
           </Link>
           <div>
             <h1>Faça seu cadastro</h1>
-            <p>Preencha os campos ao lado e comece a gerenciar sua colheita!</p>
+            <p>Preencha os campos ao lado e comece a gerenciar sua produção!</p>
           </div>
         </section>
 
         <form className={styles.form} onSubmit={handleRegister}>
-
           <div>
             <label htmlFor="">Nome Completo</label>
             <input
@@ -129,6 +128,7 @@ export function Register() {
           <div>
             <label htmlFor="">Senha</label>
             <input
+              type="password"
               placeholder="Senha"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

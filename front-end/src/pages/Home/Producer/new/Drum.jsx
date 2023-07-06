@@ -19,7 +19,7 @@ import api from "../../../../services/api";
 import { Header } from "../../../../components/Header";
 import { useAuth } from "../../../../contexts/AuthContext";
 
-var crypto = require("crypto");
+//var crypto = require("crypto");
 //import { Container } from "./style";
 
 export function Drum() {
@@ -32,7 +32,7 @@ export function Drum() {
 
   const [batchs, setBatchs] = useState([]);
   const [selectedBatch, setSelectedBatch] = useState("");
-  const [code, setCode] = useState("Apiario MN");
+  const [code, setCode] = useState("");
   const [weight, setWeight] = useState(20);
   const [packing, setPacking] = useState("Tambor de plastico");
   const [flowering, setflowering] = useState("Jandaira");

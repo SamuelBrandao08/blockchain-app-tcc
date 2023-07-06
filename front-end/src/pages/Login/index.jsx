@@ -7,16 +7,16 @@ import { useAuth } from "../../contexts/AuthContext";
 import styles from "./style.module.scss";
 
 export default function Login() {
-  const { signIn } = useAuth()
-  const [login, setLogin] = useState("samuel@email.com");
+  const { signIn } = useAuth();
+  const [login, setLogin] = useState("samuelbrandao@email.com");
   const [password, setPassword] = useState("alunoufc");
   const history = useHistory("");
 
   async function handleLogin(e) {
     e.preventDefault();
-    const user = await signIn(login, password)
+    const user = await signIn(login, password);
     if (user) {
-      history.push("/home")
+      history.push("/home");
     }
   }
 
@@ -30,7 +30,6 @@ export default function Login() {
       </div>
       <section className={styles.form}>
         <div>
-
           <h1>Faça seu login</h1>
           <form onSubmit={handleLogin}>
             <div>
@@ -46,6 +45,7 @@ export default function Login() {
               <div className={styles.inputWrapper}>
                 <label htmlFor="password">Senha</label>
                 <input
+                  type="password"
                   placeholder="Senha"
                   name="password"
                   value={password}

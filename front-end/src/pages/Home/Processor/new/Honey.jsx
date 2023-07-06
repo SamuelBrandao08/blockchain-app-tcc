@@ -13,7 +13,7 @@ import { useEffect } from "react";
 import useEvent from "../../../../hooks/useEvent";
 import api from "../../../../services/api";
 import useConnect from "../../../../hooks/useConnect";
-var crypto = require("crypto");
+//var crypto = require("crypto");
 // import { Container } from './styles';
 
 const honeyOptions = [
