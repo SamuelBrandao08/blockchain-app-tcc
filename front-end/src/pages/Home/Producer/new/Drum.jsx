@@ -8,8 +8,9 @@ import PRC from "../../../../abi/Production.json";
 import TUC from "../../../../abi/UpdateTr.json";
 import { Production } from "../../../../abi/address.json";
 import { UpdateTr } from "../../../../abi/address.json";
-import DatePicker from "react-datepicker";
+import DatePicker, { registerLocale } from "react-datepicker";
 import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 import "react-datepicker/dist/react-datepicker.css";
 import Select from "react-select";
 
@@ -18,9 +19,10 @@ import useEvent from "../../../../hooks/useEvent";
 import api from "../../../../services/api";
 import { Header } from "../../../../components/Header";
 import { useAuth } from "../../../../contexts/AuthContext";
+import styles from "./style.module.scss";
 
+registerLocale("ptBR", ptBR);
 var crypto = require("crypto");
-//import { Container } from "./style";
 
 export function Drum() {
   const { user } = useAuth()
@@ -147,71 +149,93 @@ export function Drum() {
   };
 
   return (
-    <div className="new-honey-container">
+    <div className={styles.container}>
       <Header />
-
-      <div>
-        <section>
+      <div className={styles.backButton}>
+        <Link className="back-link" to="/home">
+          <FiArrowLeft size={16} color="#e02041" />
+          Voltar
+        </Link>
+      </div>
+      <main className={styles.content}>
+        <div className={styles.titleForm}>
           <h1>Cadastrar novo mel</h1>
           <p>Descreva as propriedades do seu mel!</p>
-
-          <Link className="back-link" to="/home">
-            <FiArrowLeft size={16} color="#e02041" />
-            Voltar para home
-          </Link>
-        </section>
-
-        <Tabs>
-          <TabList>
+        </div>
+        <Tabs className={styles.tabs}>
+          <TabList className={styles.tabList}>
             <Tab>Tambor de Mel</Tab>
             <Tab>Palete</Tab>
           </TabList>
 
           <TabPanel>
-            <form onSubmit={handleNewDrum}>
-              <input
-                placeholder="Codigo do produto"
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-              />
-              <input
-                placeholder="Peso liquido"
-                name="weight"
-                value={weight}
-                onChange={(e) => setWeight(e.target.value)}
-              />
-              <input
-                placeholder="Embalagem"
-                value={packing}
-                onChange={(e) => setPacking(e.target.value)}
-              />
-              <input
-                placeholder="Florada"
-                value={flowering}
-                onChange={(e) => setflowering(e.target.value)}
-              />
-              <DatePicker
-                selected={startDate}
-                onChange={(date) => setStartDate(date)}
-                showTimeSelect
-                dateFormat="dd/MM/yyyy-HH:mm:ss"
-              />
-
-              <input
-                type="text"
-                placeholder="Id das colmeias"
-                value={hivesId}
-                onChange={(e) => setHivesId(e.target.value)}
-              />
-
-              <div className="input-group">
-                <Select
-                  defaultValue={selectedBatch}
-                  onChange={(e) => setSelectedBatch(e.value)}
-                  options={batchs}
-                  placeholder={selectedBatch ?? "loading..."}
+            <form className={styles.form} onSubmit={handleNewDrum}>
+              <div className={styles.inputWrapper}>
+                <label htmlFor="">Senha</label>
+                <input
+                  placeholder="Codigo do produto"
+                  value={code}
+                  onChange={(e) => setCode(e.target.value)}
                 />
-
+              </div>
+              <div className={styles.inputWrapper}>
+                <label htmlFor="">Senha</label>
+                <input
+                  placeholder="Peso liquido"
+                  name="weight"
+                  value={weight}
+                  onChange={(e) => setWeight(e.target.value)}
+                />
+              </div>
+              <div className={styles.inputWrapper}>
+                <label htmlFor="">Senha</label>
+                <input
+                  placeholder="Embalagem"
+                  value={packing}
+                  onChange={(e) => setPacking(e.target.value)}
+                />
+              </div>
+              <div className={styles.inputWrapper}>
+                <label htmlFor="">Senha</label>
+                <input
+                  placeholder="Florada"
+                  value={flowering}
+                  onChange={(e) => setflowering(e.target.value)}
+                />
+              </div>
+              <div className={styles.inputWrapper}>
+                <label htmlFor="">Senha</label>
+                <DatePicker
+                  timeCaption="Horas"
+                  locale={ptBR}
+                  selected={startDate}
+                  onChange={(date) => setStartDate(date)}
+                  showTimeSelect
+                  dateFormat="dd/MM/yyyy-HH:mm:ss"
+                  className={styles.datePicker}
+                />
+              </div>
+              <div className={styles.inputWrapper}>
+                <label htmlFor="">Senha</label>
+                <input
+                  type="text"
+                  placeholder="Id das colmeias"
+                  value={hivesId}
+                  onChange={(e) => setHivesId(e.target.value)}
+                />
+              </div>
+              <div className={`${styles.inputWrapper} ${styles.inputWrapperSelect}`}>
+                <div>
+                  <label htmlFor="select">Senha</label>
+                  <Select
+                    id="select"
+                    className={styles.select}
+                    defaultValue={selectedBatch}
+                    onChange={(e) => setSelectedBatch(e.value)}
+                    options={batchs}
+                    placeholder={selectedBatch ?? "loading..."}
+                  />
+                </div>
                 <button className="button" onClick={generateBatch}>
                   Gerar Lote
                 </button>
@@ -223,18 +247,23 @@ export function Drum() {
           </TabPanel>
 
           <TabPanel>
-            <form onSubmit={handleNewPallet}>
-              <input
-                placeholder="Lote do Produto"
-                value={selectedBatch}
-                onChange={(e) => setSelectedBatch(e.target.value)}
-              />
-
-              <input
-                placeholder="Unidades que compõem o palete"
-                value={drumsId}
-                onChange={(e) => setDrumsId(e.target.value)}
-              />
+            <form className={styles.form} onSubmit={handleNewPallet}>
+              <div className={styles.inputWrapper}>
+                <label htmlFor="">Senha</label>
+                <input
+                  placeholder="Lote do Produto"
+                  value={selectedBatch}
+                  onChange={(e) => setSelectedBatch(e.target.value)}
+                />
+              </div>
+              <div className={styles.inputWrapper}>
+                <label htmlFor="">Senha</label>
+                <input
+                  placeholder="Unidades que compõem o palete"
+                  value={drumsId}
+                  onChange={(e) => setDrumsId(e.target.value)}
+                />
+              </div>
 
               <button className="button" type="submit">
                 Cadastrar
@@ -242,7 +271,7 @@ export function Drum() {
             </form>
           </TabPanel>
         </Tabs>
-      </div>
+      </main>
     </div>
   );
 }
