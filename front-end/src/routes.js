@@ -12,6 +12,9 @@ import { Register } from "./pages/Register";
 import ProducerTransaction from "./pages/Home/Producer/Transaction";
 import Receiver from "./pages/Home/Processor/Components/Feedstock/Receiver";
 import Dispatcher from "./pages/Home/Processor/Components/Dispatched/Dispatcher";
+import { DistributorReceiver } from "./pages/Home/Distributor/Components/Receiver";
+import { DistributorDispatcher } from "./pages/Home/Distributor/Components/Dispatcher";
+import { MerchantReceiver } from "./pages/Home/Merchant/Components/Receiver";
 import { useAuth } from "./contexts/AuthContext";
 import { Redirect } from "react-router-dom/cjs/react-router-dom.min";
 
@@ -32,9 +35,15 @@ export default function Routes() {
                   component={ProducerTransaction}
                 />
                 <Route path="/producer/new/drum" component={Drum} />
+
                 <Route path="/processor/new/honey" component={Honey} />
                 <Route path="/processor/receiver" component={Receiver} />
                 <Route path="/processor/dispatcher" component={Dispatcher} />
+
+                <Route path="/distributor/receiver" component={DistributorReceiver} />
+                <Route path="/distributor/dispatcher" component={DistributorDispatcher} />
+
+                <Route path="/merchant/receiver" component={MerchantReceiver} />
                 <Route render={() => <Redirect to="/home" />} />
               </>
             ) : (

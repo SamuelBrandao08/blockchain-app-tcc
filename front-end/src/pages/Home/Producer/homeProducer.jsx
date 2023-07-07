@@ -182,10 +182,6 @@ function HomeProducer({ user }) {
           disableRowSelectionOnClick
           disableSelectionOnClick
           loading={false}
-          // components={{
-          //   Pagination,
-          //   Cell: isFetching ? CustomSkeleton : GridCell,
-          // }}
         />
         {/* <HoneyProduction
           drums={drums}

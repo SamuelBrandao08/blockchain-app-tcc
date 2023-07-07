@@ -14,50 +14,59 @@ const urls = {
     dispatcher: { url: "/processor/dispatcher" },
     receiver: { url: "/processor/receiver" },
   },
+  distribuidor: {
+    dispatcher: { url: "/distributor/dispatcher" },
+    receiver: { url: "/distributor/receiver" },
+  },
+  comerciante: {
+    receiver: { url: "/distributor/receiver" },
+  },
 };
 
 export function Navbar() {
   const { user } = useAuth();
-  console.log(user);
-  const curentUrl = window.location.pathname;
+  const currentUrl = window.location.pathname;
 
   return (
     <nav className={styles.container}>
       {[profileConstants.PRODUCER, profileConstants.PROCESSOR].includes(
         user.role
       ) && (
-        <Link
-          className={
-            styles[curentUrl === urls[user.role]["register"].url && "active"]
-          }
-          to={urls[user.role]["register"].url}
-        >
-          Registrar
-        </Link>
-      )}
-      {user.role === profileConstants.PROCESSOR && (
-        <Link
-          className={
-            styles[curentUrl == urls[user.role]["receiver"].url && "active"]
-          }
-          to={urls[user.role]["receiver"].url}
-        >
-          Receber
-        </Link>
-      )}
+          <Link
+            className={
+              styles[currentUrl === urls[user.role]["register"].url && "active"]
+            }
+            to={urls[user.role]["register"].url}
+          >
+            Registrar
+          </Link>
+        )}
 
-      {[profileConstants.PRODUCER, profileConstants.PROCESSOR].includes(
+      {[profileConstants.PROCESSOR, profileConstants.DISTRIBUTOR, profileConstants.MERCHANT].includes(
         user.role
       ) && (
-        <Link
-          className={
-            styles[curentUrl === urls[user.role]["dispatcher"].url && "active"]
-          }
-          to={urls[user.role]["dispatcher"].url}
-        >
-          Dispachar
-        </Link>
-      )}
+          <Link
+            className={
+              styles[currentUrl === urls[user.role]["receiver"].url && "active"]
+            }
+            to={urls[user.role]["receiver"].url}
+          >
+            Receber
+          </Link>
+        )}
+
+      {[profileConstants.PRODUCER, profileConstants.PROCESSOR, profileConstants.DISTRIBUTOR].includes(
+        user.role
+      ) && (
+          <Link
+            className={
+              styles[currentUrl === urls[user.role]["dispatcher"].url && "active"]
+            }
+            to={urls[user.role]["dispatcher"].url}
+          >
+            Despachar
+          </Link>
+        )}
     </nav>
   );
 }

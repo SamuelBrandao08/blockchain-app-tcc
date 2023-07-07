@@ -1,0 +1,14 @@
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  margin: 32px;
+}
+
+.boxDataGrid {
+  height: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}

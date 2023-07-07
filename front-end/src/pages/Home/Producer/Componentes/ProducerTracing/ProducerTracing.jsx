@@ -6,11 +6,10 @@ import useContract from "../../../../../hooks/useContract";
 import { useWeb3Context } from "web3-react";
 import useConnect from "../../../../../hooks/useConnect";
 import { DataGrid as MuiDataGrid, ptBR } from "@mui/x-data-grid";
-
-// import { Container } from './styles';
-import styles from "./style.module.scss";
 import { styled } from "@mui/material";
 import { format } from "date-fns";
+
+import styles from "./style.module.scss";
 
 const DataGrid = styled(MuiDataGrid)`
   .MuiDataGrid-columnHeaders{
